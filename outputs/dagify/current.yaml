@@ -1,0 +1,109 @@
+dag_type: plain_text
+description: Create a comprehensive book on technical system design
+name: write_a_book_on_technical_system_design
+nodes:
+  choose_book_title:
+    agent: false
+    description: Select a title for the book reflecting scope and target audience
+    name: choose_book_title
+    nodes_depended_on:
+    - determine_book_scope
+    - identify_target_audience
+    nodes_dependent_on: []
+    prompt: Select a title for the book that accurately reflects its scope and target
+      audience.
+  compile_book_final_version:
+    agent: false
+    description: Compile the final version of the book with all chapters, index, and
+      conclusion
+    name: compile_book_final_version
+    nodes_depended_on:
+    - review_and_edit_book
+    - format_book_for_print
+    - design_book_cover
+    nodes_dependent_on: []
+    prompt: Compile the final version of the book, including all chapters, index,
+      and conclusion.
+  define_book_outline:
+    agent: false
+    description: Create an outline for the book with structure, chapter headings,
+      and key topics
+    name: define_book_outline
+    nodes_depended_on:
+    - determine_book_scope
+    - identify_target_audience
+    nodes_dependent_on:
+    - choose_book_title
+    prompt: Create an outline for the book that includes the structure, chapter headings,
+      and key topics.
+  design_book_cover:
+    agent: false
+    description: Design a cover for the book reflecting title and content
+    name: design_book_cover
+    nodes_depended_on:
+    - format_book_for_print
+    nodes_dependent_on: []
+    prompt: Design a cover for the book that accurately reflects its title and content.
+  determine_book_scope:
+    agent: false
+    description: Identify the book's scope, systems, and technical depth
+    name: determine_book_scope
+    nodes_depended_on: []
+    nodes_dependent_on: []
+    prompt: Define the scope of the book, including the systems to be covered and
+      the level of technical detail.
+  develop_book_index:
+    agent: false
+    description: Create an index for the book with a list of terms, names, and topics
+    name: develop_book_index
+    nodes_depended_on:
+    - write_book_chapters
+    nodes_dependent_on: []
+    prompt: Create an index for the book that includes a list of terms, names, and
+      topics.
+  draft_book_conclusion:
+    agent: false
+    description: Write a conclusion to summarize key takeaways and final thoughts
+    name: draft_book_conclusion
+    nodes_depended_on:
+    - write_book_chapters
+    nodes_dependent_on: []
+    prompt: Write a concluding chapter or section that summarizes the key takeaways
+      and final thoughts.
+  format_book_for_print:
+    agent: false
+    description: Format the book for print including layout, typography, and graphics
+    name: format_book_for_print
+    nodes_depended_on:
+    - review_and_edit_book
+    nodes_dependent_on: []
+    prompt: Format the book for print, including layout, typography, and graphics.
+  identify_target_audience:
+    agent: false
+    description: Specify the book's target audience based on technical expertise and
+      interest
+    name: identify_target_audience
+    nodes_depended_on:
+    - determine_book_scope
+    nodes_dependent_on: []
+    prompt: Determine the target audience for the book, including their level of technical
+      expertise and interest.
+  review_and_edit_book:
+    agent: false
+    description: Review and edit the book for accuracy, clarity, and consistency
+    name: review_and_edit_book
+    nodes_depended_on:
+    - write_book_chapters
+    - develop_book_index
+    - draft_book_conclusion
+    nodes_dependent_on: []
+    prompt: Review and edit the book to ensure accuracy, clarity, and consistency.
+  write_book_chapters:
+    agent: false
+    description: Write each chapter on key topics with clear explanations and examples
+    name: write_book_chapters
+    nodes_depended_on:
+    - define_book_outline
+    nodes_dependent_on: []
+    prompt: Write each chapter of the book, covering the key topics and providing
+      clear explanations and examples.
