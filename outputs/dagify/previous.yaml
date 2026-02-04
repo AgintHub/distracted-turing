@@ -1,195 +1,240 @@
 dag_type: plain_text
-description: A highly concurrent workflow for creating a pirate-themed book through
-  research, structure creation, content generation, design integration, and publishing
-  preparation.
-name: pirate_book_dag
+description: A workflow to compose a poem about hotdogs by methodically structuring
+  thematic development, imagery creation, and poetic composition within a maximally
+  concurrent framework.
+name: hotdog_poem_composition
 nodes:
-  compile_draft:
+  assemble_final_poem:
     agent: false
-    description: Assemble all chapters with initial formatting
-    name: compile_draft
+    description: Compile all components into finished form
+    name: assemble_final_poem
     nodes_depended_on:
-    - write_chapter_1
-    - write_chapter_2
-    - write_chapter_3
-    - write_chapter_4
-    - write_chapter_5
+    - review_and_refine_stanza_1
+    - review_and_refine_stanza_2
+    - review_and_refine_stanza_3
+    - review_and_refine_stanza_4
+    - review_and_refine_conclusion
     nodes_dependent_on:
-    - edit_prose
-    prompt: Combine all chapters into a single manuscript with basic formatting consistency.
-  compile_final:
+    - finalize_poem_formatting
+    - conduct_overall_poem_review
+    prompt: Combine all stanzas (using revised versions) into a sequentially coherent
+      poem, maintaining structural consistency across all elements while ensuring
+      smooth thematic progression.
+  brainstorm_hotdog_themes:
     agent: false
-    description: Prepare publication-ready manuscript including all content elements
-    name: compile_final
+    description: Identify core thematic elements for the hotdog poem
+    name: brainstorm_hotdog_themes
+    nodes_depended_on: []
+    nodes_dependent_on:
+    - generate_visual_imagery
+    - plan_poem_structure
+    prompt: List 5 distinct hotdog-related themes suitable for a poem (e.g., history,
+      cultural significance, preparation methods, sensory qualities, architectural
+      form). Each theme must be a single concept statement.
+  conduct_overall_poem_review:
+    agent: false
+    description: Verify completeness and coherence
+    name: conduct_overall_poem_review
     nodes_depended_on:
-    - edit_prose
-    - design_cover
-    - create_pirate_maps
-    - create_marketing_website
-    nodes_dependent_on:
-    - submit_for_publishing
-    prompt: Assemble final manuscript with chapter content, cover design, maps, and
-      marketing materials.
-  create_marketing_website:
-    agent: false
-    description: Build digital platform for book promotion
-    name: create_marketing_website
-    nodes_depended_on: []
-    nodes_dependent_on:
-    - compile_final
-    prompt: Create a book marketing website with narrative samples, author bio, and
-      event calendar.
-  create_pirate_maps:
-    agent: false
-    description: Design navigational maps for treasure locations
-    name: create_pirate_maps
-    nodes_depended_on:
-    - develop_outline
-    nodes_dependent_on:
-    - compile_final
-    prompt: Create 3 hand-drawn style maps showing key pirate locations and treasure
-      sites referenced in the narrative.
-  design_cover:
-    agent: false
-    description: Create visual front cover design
-    name: design_cover
-    nodes_depended_on: []
-    nodes_dependent_on:
-    - compile_final
-    prompt: Design a pirate-themed book cover integrating appropriate visual elements
-      (ships/jackals/coins/scrolls).
-  develop_characters:
-    agent: false
-    description: Design pirate characters with motivations and arcs
-    name: develop_characters
-    nodes_depended_on: []
-    nodes_dependent_on:
-    - develop_outline
-    prompt: Create detailed character profiles for 10 key pirate characters including
-      their defining traits and narrative arcs.
-  develop_outline:
-    agent: false
-    description: Create structural framework integrating research and themes
-    name: develop_outline
-    nodes_depended_on:
-    - research_pirate_history
-    - research_maritime_tech
-    - research_cryptocurrency_parallelism
-    - develop_themes
-    - develop_characters
-    nodes_dependent_on:
-    - write_chapter_1
-    - write_chapter_2
-    - write_chapter_3
-    - write_chapter_4
-    - write_chapter_5
-    prompt: Create a 5-chapter outline integrating pirate history research, defined
-      themes, and character arcs with strategic plot points.
-  develop_themes:
-    agent: false
-    description: Create thematic elements for the pirate narrative
-    name: develop_themes
-    nodes_depended_on: []
-    nodes_dependent_on:
-    - develop_outline
-    prompt: Define 5 core themes for the pirate narrative such as freedom vs responsibility,
-      treasure vs treasure hunters, or mutiny metaphors.
-  edit_prose:
-    agent: false
-    description: Refine language for clarity and narrative flow
-    name: edit_prose
-    nodes_depended_on:
-    - compile_draft
-    nodes_dependent_on:
-    - develop_index
-    prompt: Perform language editing of entire manuscript for consistency, grammar,
-      and narrative pacing.
-  research_cryptocurrency_parallelism:
-    agent: false
-    description: Analyze modern cryptocurrency systems to draw metaphorical parallels
-      with pirate systems
-    name: research_cryptocurrency_parallelism
-    nodes_depended_on: []
-    nodes_dependent_on:
-    - develop_outline
-    prompt: Compare blockchain protocols with pirate information sharing networks
-      of the 1700s.
-  research_maritime_tech:
-    agent: false
-    description: Investigate ship types, naval combat systems, and navigation methods
-      from the golden age of piracy
-    name: research_maritime_tech
-    nodes_depended_on: []
-    nodes_dependent_on:
-    - develop_outline
-    prompt: Document ship types used by pirates, their combat capabilities, and navigation
-      tools from 1700-1800.
-  research_pirate_history:
-    agent: false
-    description: Compile factual information about historical pirates, their cultures,
-      and common terminology
-    name: research_pirate_history
-    nodes_depended_on: []
-    nodes_dependent_on:
-    - develop_outline
-    prompt: Create a fact sheet about piracy in the 1600-1800 era. Include dates,
-      major figures, terminology, and cultural practices.
-  submit_for_publishing:
-    agent: false
-    description: Prepare and submit manuscript to publishing platforms
-    name: submit_for_publishing
-    nodes_depended_on:
-    - compile_final
+    - assemble_final_poem
+    - finalize_poem_formatting
     nodes_dependent_on: []
-    prompt: Prepare manuscript submissions for major publishing channels with appropriate
-      metadata and cover letter.
-  write_chapter_1:
+    prompt: Evaluate the complete poem for thematic unity, structural consistency,
+      and emotional impact. Identify any inconsistencies or formatting issues requiring
+      correction in final output.
+  finalize_poem_formatting:
     agent: false
-    description: Introduce pirate protagonist and core conflicts
-    name: write_chapter_1
+    description: Apply consistent stylistic formatting
+    name: finalize_poem_formatting
     nodes_depended_on:
-    - develop_outline
-    nodes_dependent_on:
-    - compile_draft
-    prompt: Write first chapter introducing protagonist's pirate crew, central mission,
-      and initial conflict based on outline structure.
-  write_chapter_2:
+    - assemble_final_poem
+    nodes_dependent_on: []
+    prompt: Apply consistent capitalization, punctuation, and stanza spacing to the
+      assembled poem while verifying metrical and rhyme pattern consistency across
+      all lines.
+  generate_visual_imagery:
     agent: false
-    description: Develop pirate alliances and navigation challenges
-    name: write_chapter_2
+    description: Create vivid visual hotdog associations
+    name: generate_visual_imagery
     nodes_depended_on:
-    - develop_outline
+    - brainstorm_hotdog_themes
     nodes_dependent_on:
-    - compile_draft
-    prompt: Develop second chapter focusing on crew dynamics and maritime encounters
-      according to outline framework.
-  write_chapter_3:
+    - write_stanza_1
+    - write_stanza_2
+    - write_stanza_3
+    - write_stanza_4
+    - write_stanza_5
+    prompt: Generate 6 distinct visual imagery descriptions for hotdogs across different
+      contexts (e.g., steaming from a street cart, lying on a bun, as part of a gourmet
+      presentation). Each should be a single evocative phrase.
+  incorporate_symbolism:
     agent: false
-    description: Introduce historical/cryptocurrency system convergence
-    name: write_chapter_3
-    nodes_depended_on:
-    - develop_outline
+    description: Develop symbolic representations for hotdog elements
+    name: incorporate_symbolism
+    nodes_depended_on: []
     nodes_dependent_on:
-    - compile_draft
-    prompt: Write third chapter connecting historical pirate practices with modern
-      cryptocurrency concepts as outlined.
-  write_chapter_4:
+    - write_stanza_1
+    - write_stanza_2
+    - write_stanza_3
+    - write_stanza_4
+    - write_stanza_5
+    prompt: Identify 4 symbolic interpretations of hotdogs in human culture (e.g.
+      comfort, nostalgia, urban grit, indulgence). Each symbol should be phrased as
+      a standalone metaphorical association.
+  plan_poem_structure:
     agent: false
-    description: Build climax around pirate treasure discovery
-    name: write_chapter_4
+    description: Define poem parameters and stanza development
+    name: plan_poem_structure
     nodes_depended_on:
-    - develop_outline
+    - brainstorm_hotdog_themes
     nodes_dependent_on:
-    - compile_draft
-    prompt: Develop fourth chapter constructing tension toward treasure discovery
-      with defined themes and plot structure.
-  write_chapter_5:
+    - write_stanza_1
+    - write_stanza_2
+    - write_stanza_3
+    - write_stanza_4
+    - write_stanza_5
+    - write_conclusion_stanza
+    prompt: 'Design the poem''s architecture: specify total stanzas, lines per stanza,
+      metrical pattern, and suggested emotional progression (e.g., 5 quatrains with
+      ABAB rhyme, moving from nostalgic to celebratory).'
+  review_and_refine_conclusion:
     agent: false
-    description: Resolve pirate story arcs with thematic conclusions
-    name: write_chapter_5
+    description: Analyze and improve conclusion
+    name: review_and_refine_conclusion
     nodes_depended_on:
-    - develop_outline
+    - write_conclusion_stanza
+    - review_and_refine_stanza_5
     nodes_dependent_on:
-    - compile_draft
-    prompt: Write final chapter resolving character arcs and delivering thematic resolution
-      as per outline structure.
+    - assemble_final_poem
+    prompt: Evaluate the conclusion stanza's resolution of themes and emotional trajectory.
+      Suggest 2-3 targeted revisions to improve closure or poetic impact while preserving
+      structural requirements.
+  review_and_refine_stanza_1:
+    agent: false
+    description: Analyze and improve first stanza
+    name: review_and_refine_stanza_1
+    nodes_depended_on:
+    - write_stanza_1
+    nodes_dependent_on: []
+    prompt: Evaluate stanza 1 for metrical accuracy, emotional impact, and connection
+      to themes. Suggest 2-3 specific revisions to enhance imagery or symbolic resonance
+      without altering the core content.
+  review_and_refine_stanza_2:
+    agent: false
+    description: Analyze and improve second stanza
+    name: review_and_refine_stanza_2
+    nodes_depended_on:
+    - write_stanza_2
+    nodes_dependent_on: []
+    prompt: Evaluate stanza 2 for thematic consistency and structural adherence. Suggest
+      2-3 specific revisions to strengthen cultural references or metaphorical connections
+      while maintaining existing scope.
+  review_and_refine_stanza_3:
+    agent: false
+    description: Analyze and improve third stanza
+    name: review_and_refine_stanza_3
+    nodes_depended_on:
+    - write_stanza_3
+    nodes_dependent_on: []
+    prompt: Assess stanza 3 for sensory description and structural integrity. Propose
+      2-3 specific revisions to enhance anatomical detail or symbolic association
+      without changing the core framework.
+  review_and_refine_stanza_4:
+    agent: false
+    description: Analyze and improve fourth stanza
+    name: review_and_refine_stanza_4
+    nodes_depended_on:
+    - write_stanza_4
+    nodes_dependent_on: []
+    prompt: Evaluate stanza 4 for sensory impact and structural alignment. Suggest
+      2-3 targeted revisions to refine experiential description or symbolic mapping
+      while preserving the established form.
+  review_and_refine_stanza_5:
+    agent: false
+    description: Analyze and improve fifth stanza
+    name: review_and_refine_stanza_5
+    nodes_depended_on:
+    - write_stanza_5
+    nodes_dependent_on:
+    - review_and_refine_conclusion
+    prompt: Assess stanza 5 for thematic synthesis and structural consistency. Propose
+      2-3 specific revisions to strengthen cumulative meaning or emotional impact
+      while maintaining the core composition.
+  write_conclusion_stanza:
+    agent: false
+    description: Draft final concluding stanza
+    name: write_conclusion_stanza
+    nodes_depended_on:
+    - plan_poem_structure
+    - write_stanza_5
+    nodes_dependent_on:
+    - review_and_refine_conclusion
+    prompt: Write a 4-line closing stanza that reflects on the cumulative themes,
+      incorporating at least one new metaphor and resolving the poem's emotional trajectory
+      while preserving structural consistency.
+  write_stanza_1:
+    agent: false
+    description: Compose opening stanza with thematic foundation
+    name: write_stanza_1
+    nodes_depended_on:
+    - plan_poem_structure
+    - generate_visual_imagery
+    - incorporate_symbolism
+    nodes_dependent_on:
+    - review_and_refine_stanza_1
+    prompt: Write a self-contained 4-line stanza introducing hotdogs as a thematic
+      focus, incorporating 1 visual image and 1 symbolic element while adhering to
+      the specified structure.
+  write_stanza_2:
+    agent: false
+    description: Develop cultural significance layer
+    name: write_stanza_2
+    nodes_depended_on:
+    - plan_poem_structure
+    - generate_visual_imagery
+    - incorporate_symbolism
+    nodes_dependent_on:
+    - review_and_refine_stanza_2
+    prompt: Write a 4-line stanza exploring hotdogs in social contexts (e.g., baseball
+      games, street vendors), using 1 visual example and 1 symbolic concept from earlier
+      steps, maintaining structural consistency.
+  write_stanza_3:
+    agent: false
+    description: Describe physical form and components
+    name: write_stanza_3
+    nodes_depended_on:
+    - plan_poem_structure
+    - generate_visual_imagery
+    - incorporate_symbolism
+    nodes_dependent_on:
+    - review_and_refine_stanza_3
+    prompt: Write a 4-line stanza focused on the anatomy of a hotdog (bun, sausage,
+      toppings), embedding at least 1 visual detail and 1 symbolic interpretation
+      while conforming to the planned meter and rhyme.
+  write_stanza_4:
+    agent: false
+    description: Explore sensory experience
+    name: write_stanza_4
+    nodes_depended_on:
+    - plan_poem_structure
+    - generate_visual_imagery
+    - incorporate_symbolism
+    nodes_dependent_on:
+    - review_and_refine_stanza_4
+    prompt: Write a 4-line stanza capturing the taste, smell, and warmth of hotdogs,
+      incorporating 1 imagery element and 1 symbolic mapping, keeping structural elements
+      consistent.
+  write_stanza_5:
+    agent: false
+    description: Conclude thematic development
+    name: write_stanza_5
+    nodes_depended_on:
+    - plan_poem_structure
+    - generate_visual_imagery
+    - incorporate_symbolism
+    nodes_dependent_on:
+    - review_and_refine_stanza_5
+    - write_conclusion_stanza
+    prompt: Compose the penultimate stanza synthesizing previous themes, using 2 visual
+      elements and 2 symbolic concepts while maintaining the established structure
+      and advancing the poem's emotional arc.
