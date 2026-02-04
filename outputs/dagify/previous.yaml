@@ -1,100 +1,146 @@
 dag_type: plain_text
-description: A highly concurrent workflow for designing, executing, and validating
-  tests through atomic, stateless, parallelizable steps
-name: test_workflow
+description: Create a detailed screenplay for a movie where Tony Soprano lives and
+  becomes a hairdresser, structuring the narrative with character development and
+  comedic gangster-haircare crossover elements.
+name: sopranos_hairdresser_screenplay
 nodes:
-  clean_up_test_environment:
+  create_character_profiles:
     agent: false
-    description: Remove temporary test data and restore production state
-    name: clean_up_test_environment
-    nodes_depended_on:
-    - prepare_test_environment
-    nodes_dependent_on: []
-    prompt: Delete all test-specific configurations, reset databases, and ensure the
-      environment is restored to its pre-test state. Confirm through basic environment
-      validation checks.
-  create_test_cases:
-    agent: false
-    description: Design individual test scenarios based on requirements
-    name: create_test_cases
-    nodes_depended_on:
-    - define_test_scope
-    nodes_dependent_on:
-    - execute_test_cases
-    - generate_test_report
-    prompt: Generate 10-15 distinct test cases covering requirements, each with preconditions,
-      steps, and expected outcomes. Format as a numbered list with test case identifiers.
-  define_test_scope:
-    agent: false
-    description: Establish boundaries and constraints for the testing effort
-    name: define_test_scope
+    description: Define key character traits and roles in the new setting
+    name: create_character_profiles
     nodes_depended_on: []
     nodes_dependent_on:
-    - gather_test_requirements
-    - create_test_cases
-    - prepare_test_environment
-    prompt: Create a test scope document specifying what components will be tested,
-      excluded items, testing depth, and success criteria. Use clear bullet points
-      for each scope element.
-  execute_test_cases:
+    - write_dialogue_tony
+    - write_dialogue_clients
+    - establish_tony_backstory
+    prompt: Develop detailed character profiles for Tony as a hairdresser, his criminal
+      colleagues working secretly in the salon, and rival hairstylist characters.
+      Include 2-3 unique traits per character.
+  create_end_titles:
     agent: false
-    description: Carry out automated/manual test execution
-    name: execute_test_cases
+    description: Craft closing credits
+    name: create_end_titles
     nodes_depended_on:
-    - create_test_cases
-    - prepare_test_environment
-    nodes_dependent_on:
-    - log_execution_results
-    prompt: Execute each test case from the test case document in the prepared environment.
-      Record basic test status (pass/fail) for each test case.
-  gather_test_requirements:
+    - write_act_3
+    nodes_dependent_on: []
+    prompt: Write closing credits sequence description blending gangster and hairdressing
+      motifs. Include character fates, on-screen text credits with special formatting,
+      and final musical cue.
+  describe_salon_setting:
     agent: false
-    description: Collect and document testing requirements from stakeholders
-    name: gather_test_requirements
+    description: Create detailed environment description for the hair salon
+    name: describe_salon_setting
     nodes_depended_on: []
     nodes_dependent_on:
-    - define_test_scope
-    prompt: Generate a detailed list of testing requirements based on stakeholder
-      expectations, including functional and non-functional criteria. Format as bullet
-      points with one-line descriptions for each requirement.
-  generate_test_report:
+    - write_act_1
+    - write_scenes_salon_exterior
+    prompt: Describe the physical layout of Tony's hair salon ("Little Tony's Chop
+      Shop"). Include mafia-themed elements mixed with barber shop kitsch, client
+      demographics, and technical equipment.
+  establish_tony_backstory:
     agent: false
-    description: Produce final test summary and defect analysis
-    name: generate_test_report
+    description: Develop Tony's motivation for becoming a hairdresser while retaining
+      his criminal persona
+    name: establish_tony_backstory
+    nodes_depended_on: []
+    nodes_dependent_on:
+    - write_plot_outline
+    - create_character_profiles
+    prompt: Generate a 200-word backstory explaining how and why Tony Soprano (his
+      criminal identity intact) transitions to becoming a hairdresser. Include specific
+      triggers and internal conflicts.
+  write_act_1:
+    agent: false
+    description: Compose screenplay content for Act 1
+    name: write_act_1
     nodes_depended_on:
-    - validate_test_results
-    - create_test_cases
+    - write_plot_outline
+    - describe_salon_setting
+    - create_character_profiles
+    nodes_dependent_on:
+    - write_act_2
+    - write_scenes_salon_exterior
+    prompt: Write Act 1 of the screenplay (15-20 pages), showing Tony's initiation
+      into hairdressing. Include 3-4 key scenes with dialogue and gangster-themed
+      salon rituals.
+  write_act_2:
+    agent: false
+    description: Compose screenplay content for Act 2
+    name: write_act_2
+    nodes_depended_on:
+    - write_act_1
+    - write_plot_outline
+    nodes_dependent_on:
+    - write_act_3
+    - write_dialogue_tony
+    prompt: Write Act 2 of the screenplay (30-40 pages) focusing on business challenges
+      and mafia interference. Include 4-6 key scenes showing Tony balancing his dual
+      identities.
+  write_act_3:
+    agent: false
+    description: Compose screenplay content for Act 3
+    name: write_act_3
+    nodes_depended_on:
+    - write_act_2
+    - write_plot_outline
     nodes_dependent_on: []
-    prompt: Generate a comprehensive test report with pass/fail statistics, defect
-      classifications, root cause analysis, and recommendations for remediation.
-  log_execution_results:
+    prompt: Write Act 3 of the screenplay (20-25 pages) resolving internal conflicts.
+      Include 3-5 climactic scenes showing the fusion of mafia operations and hairdressing
+      business.
+  write_dialogue_clients:
     agent: false
-    description: Capture raw test output and system behaviors
-    name: log_execution_results
+    description: Client character dialogue sequences
+    name: write_dialogue_clients
     nodes_depended_on:
-    - execute_test_cases
+    - create_character_profiles
     nodes_dependent_on:
-    - validate_test_results
-    prompt: Systematically record detailed execution logs including screenshots, error
-      messages, response times, and system state changes for each test case.
-  prepare_test_environment:
+    - write_act_2
+    prompt: Write sample dialogue for 4-6 client characters in various scenarios (bookings,
+      conflicts, eavesdropping on criminal plot). Maintain distinct voices for each
+      client archetype.
+  write_dialogue_tony:
     agent: false
-    description: Configure hardware, software, and test data infrastructure
-    name: prepare_test_environment
+    description: Specialized Tony Soprano dialogue sequences
+    name: write_dialogue_tony
     nodes_depended_on:
-    - define_test_scope
+    - create_character_profiles
     nodes_dependent_on:
-    - execute_test_cases
-    - clean_up_test_environment
-    prompt: Create a test environment blueprint specifying software versions, hardware
-      configurations, network parameters, and data sets to be used during testing.
-  validate_test_results:
+    - write_act_2
+    - write_act_3
+    prompt: Write 10-12 lines of signature Tony Soprano dialogue demonstrating his
+      typical syntax, attitude, and references to both mafia operations and hairdressing
+      metaphors.
+  write_plot_outline:
     agent: false
-    description: Analyze outcomes against expectations
-    name: validate_test_results
-    nodes_depended_on:
-    - log_execution_results
+    description: Structure the screenplay into 3 acts with major plot points
+    name: write_plot_outline
+    nodes_depended_on: []
     nodes_dependent_on:
-    - generate_test_report
-    prompt: Compare test execution logs against the expected outcomes in the test
-      case document. Note discrepancies, performance metrics, and error patterns.
+    - write_title_screen
+    - write_act_1
+    - write_act_2
+    - write_act_3
+    prompt: Create a three-act story structure for Tony Soprano transitioning into
+      hairdressing. Include mafia conflicts, salon business challenges, and character
+      arcs in each act.
+  write_scenes_salon_exterior:
+    agent: false
+    description: Specific exterior/location shoot scene descriptions
+    name: write_scenes_salon_exterior
+    nodes_depended_on:
+    - describe_salon_setting
+    nodes_dependent_on:
+    - write_act_1
+    prompt: Write 5 exterior salon scene descriptions (day/night) showing interactions
+      between customers, Tony's crew members, and rival salon crews. Include location
+      details and crowd behavior.
+  write_title_screen:
+    agent: false
+    description: Craft title treatment and opening credits
+    name: write_title_screen
+    nodes_depended_on:
+    - write_plot_outline
+    nodes_dependent_on: []
+    prompt: Write a title sequence description for a mafia-themed hairdressing movie.
+      Include visual motifs, music style, and on-screen text treatment blending criminal
+      and beauty industry elements.
