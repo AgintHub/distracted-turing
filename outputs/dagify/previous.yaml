@@ -1,146 +1,195 @@
 dag_type: plain_text
-description: Create a detailed screenplay for a movie where Tony Soprano lives and
-  becomes a hairdresser, structuring the narrative with character development and
-  comedic gangster-haircare crossover elements.
-name: sopranos_hairdresser_screenplay
+description: A highly concurrent workflow for creating a pirate-themed book through
+  research, structure creation, content generation, design integration, and publishing
+  preparation.
+name: pirate_book_dag
 nodes:
-  create_character_profiles:
+  compile_draft:
     agent: false
-    description: Define key character traits and roles in the new setting
-    name: create_character_profiles
+    description: Assemble all chapters with initial formatting
+    name: compile_draft
+    nodes_depended_on:
+    - write_chapter_1
+    - write_chapter_2
+    - write_chapter_3
+    - write_chapter_4
+    - write_chapter_5
+    nodes_dependent_on:
+    - edit_prose
+    prompt: Combine all chapters into a single manuscript with basic formatting consistency.
+  compile_final:
+    agent: false
+    description: Prepare publication-ready manuscript including all content elements
+    name: compile_final
+    nodes_depended_on:
+    - edit_prose
+    - design_cover
+    - create_pirate_maps
+    - create_marketing_website
+    nodes_dependent_on:
+    - submit_for_publishing
+    prompt: Assemble final manuscript with chapter content, cover design, maps, and
+      marketing materials.
+  create_marketing_website:
+    agent: false
+    description: Build digital platform for book promotion
+    name: create_marketing_website
     nodes_depended_on: []
     nodes_dependent_on:
-    - write_dialogue_tony
-    - write_dialogue_clients
-    - establish_tony_backstory
-    prompt: Develop detailed character profiles for Tony as a hairdresser, his criminal
-      colleagues working secretly in the salon, and rival hairstylist characters.
-      Include 2-3 unique traits per character.
-  create_end_titles:
+    - compile_final
+    prompt: Create a book marketing website with narrative samples, author bio, and
+      event calendar.
+  create_pirate_maps:
     agent: false
-    description: Craft closing credits
-    name: create_end_titles
+    description: Design navigational maps for treasure locations
+    name: create_pirate_maps
     nodes_depended_on:
-    - write_act_3
+    - develop_outline
+    nodes_dependent_on:
+    - compile_final
+    prompt: Create 3 hand-drawn style maps showing key pirate locations and treasure
+      sites referenced in the narrative.
+  design_cover:
+    agent: false
+    description: Create visual front cover design
+    name: design_cover
+    nodes_depended_on: []
+    nodes_dependent_on:
+    - compile_final
+    prompt: Design a pirate-themed book cover integrating appropriate visual elements
+      (ships/jackals/coins/scrolls).
+  develop_characters:
+    agent: false
+    description: Design pirate characters with motivations and arcs
+    name: develop_characters
+    nodes_depended_on: []
+    nodes_dependent_on:
+    - develop_outline
+    prompt: Create detailed character profiles for 10 key pirate characters including
+      their defining traits and narrative arcs.
+  develop_outline:
+    agent: false
+    description: Create structural framework integrating research and themes
+    name: develop_outline
+    nodes_depended_on:
+    - research_pirate_history
+    - research_maritime_tech
+    - research_cryptocurrency_parallelism
+    - develop_themes
+    - develop_characters
+    nodes_dependent_on:
+    - write_chapter_1
+    - write_chapter_2
+    - write_chapter_3
+    - write_chapter_4
+    - write_chapter_5
+    prompt: Create a 5-chapter outline integrating pirate history research, defined
+      themes, and character arcs with strategic plot points.
+  develop_themes:
+    agent: false
+    description: Create thematic elements for the pirate narrative
+    name: develop_themes
+    nodes_depended_on: []
+    nodes_dependent_on:
+    - develop_outline
+    prompt: Define 5 core themes for the pirate narrative such as freedom vs responsibility,
+      treasure vs treasure hunters, or mutiny metaphors.
+  edit_prose:
+    agent: false
+    description: Refine language for clarity and narrative flow
+    name: edit_prose
+    nodes_depended_on:
+    - compile_draft
+    nodes_dependent_on:
+    - develop_index
+    prompt: Perform language editing of entire manuscript for consistency, grammar,
+      and narrative pacing.
+  research_cryptocurrency_parallelism:
+    agent: false
+    description: Analyze modern cryptocurrency systems to draw metaphorical parallels
+      with pirate systems
+    name: research_cryptocurrency_parallelism
+    nodes_depended_on: []
+    nodes_dependent_on:
+    - develop_outline
+    prompt: Compare blockchain protocols with pirate information sharing networks
+      of the 1700s.
+  research_maritime_tech:
+    agent: false
+    description: Investigate ship types, naval combat systems, and navigation methods
+      from the golden age of piracy
+    name: research_maritime_tech
+    nodes_depended_on: []
+    nodes_dependent_on:
+    - develop_outline
+    prompt: Document ship types used by pirates, their combat capabilities, and navigation
+      tools from 1700-1800.
+  research_pirate_history:
+    agent: false
+    description: Compile factual information about historical pirates, their cultures,
+      and common terminology
+    name: research_pirate_history
+    nodes_depended_on: []
+    nodes_dependent_on:
+    - develop_outline
+    prompt: Create a fact sheet about piracy in the 1600-1800 era. Include dates,
+      major figures, terminology, and cultural practices.
+  submit_for_publishing:
+    agent: false
+    description: Prepare and submit manuscript to publishing platforms
+    name: submit_for_publishing
+    nodes_depended_on:
+    - compile_final
     nodes_dependent_on: []
-    prompt: Write closing credits sequence description blending gangster and hairdressing
-      motifs. Include character fates, on-screen text credits with special formatting,
-      and final musical cue.
-  describe_salon_setting:
+    prompt: Prepare manuscript submissions for major publishing channels with appropriate
+      metadata and cover letter.
+  write_chapter_1:
     agent: false
-    description: Create detailed environment description for the hair salon
-    name: describe_salon_setting
-    nodes_depended_on: []
-    nodes_dependent_on:
-    - write_act_1
-    - write_scenes_salon_exterior
-    prompt: Describe the physical layout of Tony's hair salon ("Little Tony's Chop
-      Shop"). Include mafia-themed elements mixed with barber shop kitsch, client
-      demographics, and technical equipment.
-  establish_tony_backstory:
-    agent: false
-    description: Develop Tony's motivation for becoming a hairdresser while retaining
-      his criminal persona
-    name: establish_tony_backstory
-    nodes_depended_on: []
-    nodes_dependent_on:
-    - write_plot_outline
-    - create_character_profiles
-    prompt: Generate a 200-word backstory explaining how and why Tony Soprano (his
-      criminal identity intact) transitions to becoming a hairdresser. Include specific
-      triggers and internal conflicts.
-  write_act_1:
-    agent: false
-    description: Compose screenplay content for Act 1
-    name: write_act_1
+    description: Introduce pirate protagonist and core conflicts
+    name: write_chapter_1
     nodes_depended_on:
-    - write_plot_outline
-    - describe_salon_setting
-    - create_character_profiles
+    - develop_outline
     nodes_dependent_on:
-    - write_act_2
-    - write_scenes_salon_exterior
-    prompt: Write Act 1 of the screenplay (15-20 pages), showing Tony's initiation
-      into hairdressing. Include 3-4 key scenes with dialogue and gangster-themed
-      salon rituals.
-  write_act_2:
+    - compile_draft
+    prompt: Write first chapter introducing protagonist's pirate crew, central mission,
+      and initial conflict based on outline structure.
+  write_chapter_2:
     agent: false
-    description: Compose screenplay content for Act 2
-    name: write_act_2
+    description: Develop pirate alliances and navigation challenges
+    name: write_chapter_2
     nodes_depended_on:
-    - write_act_1
-    - write_plot_outline
+    - develop_outline
     nodes_dependent_on:
-    - write_act_3
-    - write_dialogue_tony
-    prompt: Write Act 2 of the screenplay (30-40 pages) focusing on business challenges
-      and mafia interference. Include 4-6 key scenes showing Tony balancing his dual
-      identities.
-  write_act_3:
+    - compile_draft
+    prompt: Develop second chapter focusing on crew dynamics and maritime encounters
+      according to outline framework.
+  write_chapter_3:
     agent: false
-    description: Compose screenplay content for Act 3
-    name: write_act_3
+    description: Introduce historical/cryptocurrency system convergence
+    name: write_chapter_3
     nodes_depended_on:
-    - write_act_2
-    - write_plot_outline
-    nodes_dependent_on: []
-    prompt: Write Act 3 of the screenplay (20-25 pages) resolving internal conflicts.
-      Include 3-5 climactic scenes showing the fusion of mafia operations and hairdressing
-      business.
-  write_dialogue_clients:
-    agent: false
-    description: Client character dialogue sequences
-    name: write_dialogue_clients
-    nodes_depended_on:
-    - create_character_profiles
+    - develop_outline
     nodes_dependent_on:
-    - write_act_2
-    prompt: Write sample dialogue for 4-6 client characters in various scenarios (bookings,
-      conflicts, eavesdropping on criminal plot). Maintain distinct voices for each
-      client archetype.
-  write_dialogue_tony:
+    - compile_draft
+    prompt: Write third chapter connecting historical pirate practices with modern
+      cryptocurrency concepts as outlined.
+  write_chapter_4:
     agent: false
-    description: Specialized Tony Soprano dialogue sequences
-    name: write_dialogue_tony
+    description: Build climax around pirate treasure discovery
+    name: write_chapter_4
     nodes_depended_on:
-    - create_character_profiles
+    - develop_outline
     nodes_dependent_on:
-    - write_act_2
-    - write_act_3
-    prompt: Write 10-12 lines of signature Tony Soprano dialogue demonstrating his
-      typical syntax, attitude, and references to both mafia operations and hairdressing
-      metaphors.
-  write_plot_outline:
+    - compile_draft
+    prompt: Develop fourth chapter constructing tension toward treasure discovery
+      with defined themes and plot structure.
+  write_chapter_5:
     agent: false
-    description: Structure the screenplay into 3 acts with major plot points
-    name: write_plot_outline
-    nodes_depended_on: []
-    nodes_dependent_on:
-    - write_title_screen
-    - write_act_1
-    - write_act_2
-    - write_act_3
-    prompt: Create a three-act story structure for Tony Soprano transitioning into
-      hairdressing. Include mafia conflicts, salon business challenges, and character
-      arcs in each act.
-  write_scenes_salon_exterior:
-    agent: false
-    description: Specific exterior/location shoot scene descriptions
-    name: write_scenes_salon_exterior
+    description: Resolve pirate story arcs with thematic conclusions
+    name: write_chapter_5
     nodes_depended_on:
-    - describe_salon_setting
+    - develop_outline
     nodes_dependent_on:
-    - write_act_1
-    prompt: Write 5 exterior salon scene descriptions (day/night) showing interactions
-      between customers, Tony's crew members, and rival salon crews. Include location
-      details and crowd behavior.
-  write_title_screen:
-    agent: false
-    description: Craft title treatment and opening credits
-    name: write_title_screen
-    nodes_depended_on:
-    - write_plot_outline
-    nodes_dependent_on: []
-    prompt: Write a title sequence description for a mafia-themed hairdressing movie.
-      Include visual motifs, music style, and on-screen text treatment blending criminal
-      and beauty industry elements.
+    - compile_draft
+    prompt: Write final chapter resolving character arcs and delivering thematic resolution
+      as per outline structure.
