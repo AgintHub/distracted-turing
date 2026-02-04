@@ -1,240 +1,167 @@
 dag_type: plain_text
-description: A workflow to compose a poem about hotdogs by methodically structuring
-  thematic development, imagery creation, and poetic composition within a maximally
-  concurrent framework.
-name: hotdog_poem_composition
+description: A parallelized, atomic workflow for creating a song about birds, with
+  decoupled composition of lyrics, melody, harmony, and structural elements
+name: write_song_about_birds
 nodes:
-  assemble_final_poem:
+  add_harmonies:
     agent: false
-    description: Compile all components into finished form
-    name: assemble_final_poem
+    description: Implement vocal/instrumental harmonic arrangements
+    name: add_harmonies
     nodes_depended_on:
-    - review_and_refine_stanza_1
-    - review_and_refine_stanza_2
-    - review_and_refine_stanza_3
-    - review_and_refine_stanza_4
-    - review_and_refine_conclusion
+    - finalize_lyrics
+    - create_harmonies
     nodes_dependent_on:
-    - finalize_poem_formatting
-    - conduct_overall_poem_review
-    prompt: Combine all stanzas (using revised versions) into a sequentially coherent
-      poem, maintaining structural consistency across all elements while ensuring
-      smooth thematic progression.
-  brainstorm_hotdog_themes:
+    - review_and_revise
+    prompt: Apply harmonic layers to vocal lines and instrumental tracks based on
+      established chord structure
+  add_instrumentation:
     agent: false
-    description: Identify core thematic elements for the hotdog poem
-    name: brainstorm_hotdog_themes
+    description: Select and sequence accompaniment instruments
+    name: add_instrumentation
+    nodes_depended_on:
+    - arrange_sections
+    nodes_dependent_on:
+    - write_bridge
+    - finalize_lyrics
+    prompt: Specify instrumentation (guitar, piano, etc.) and rhythmic patterns that
+      enhance bird motifs
+  arrange_sections:
+    agent: false
+    description: Sequence and develop section instrumentation
+    name: arrange_sections
+    nodes_depended_on:
+    - decide_song_structure
+    - create_chord_progression
+    nodes_dependent_on:
+    - add_instrumentation
+    prompt: Plan dynamic shifts, instrumental entry points, and phrase repetition
+      for each structural element
+  brainstorm_bird_themes:
+    agent: false
+    description: Generate thematic foundations for lyrical content
+    name: brainstorm_bird_themes
     nodes_depended_on: []
     nodes_dependent_on:
-    - generate_visual_imagery
-    - plan_poem_structure
-    prompt: List 5 distinct hotdog-related themes suitable for a poem (e.g., history,
-      cultural significance, preparation methods, sensory qualities, architectural
-      form). Each theme must be a single concept statement.
-  conduct_overall_poem_review:
+    - create_verse_lyrics
+    - create_chorus_lyrics
+    prompt: List 5-8 bird-related themes (e.g., flight, migration, symbolism) with
+      brief emotional associations for each
+  choose_key_and_tempo:
     agent: false
-    description: Verify completeness and coherence
-    name: conduct_overall_poem_review
-    nodes_depended_on:
-    - assemble_final_poem
-    - finalize_poem_formatting
-    nodes_dependent_on: []
-    prompt: Evaluate the complete poem for thematic unity, structural consistency,
-      and emotional impact. Identify any inconsistencies or formatting issues requiring
-      correction in final output.
-  finalize_poem_formatting:
-    agent: false
-    description: Apply consistent stylistic formatting
-    name: finalize_poem_formatting
-    nodes_depended_on:
-    - assemble_final_poem
-    nodes_dependent_on: []
-    prompt: Apply consistent capitalization, punctuation, and stanza spacing to the
-      assembled poem while verifying metrical and rhyme pattern consistency across
-      all lines.
-  generate_visual_imagery:
-    agent: false
-    description: Create vivid visual hotdog associations
-    name: generate_visual_imagery
-    nodes_depended_on:
-    - brainstorm_hotdog_themes
-    nodes_dependent_on:
-    - write_stanza_1
-    - write_stanza_2
-    - write_stanza_3
-    - write_stanza_4
-    - write_stanza_5
-    prompt: Generate 6 distinct visual imagery descriptions for hotdogs across different
-      contexts (e.g., steaming from a street cart, lying on a bun, as part of a gourmet
-      presentation). Each should be a single evocative phrase.
-  incorporate_symbolism:
-    agent: false
-    description: Develop symbolic representations for hotdog elements
-    name: incorporate_symbolism
+    description: Determine tonal foundation and rhythmic framework
+    name: choose_key_and_tempo
     nodes_depended_on: []
     nodes_dependent_on:
-    - write_stanza_1
-    - write_stanza_2
-    - write_stanza_3
-    - write_stanza_4
-    - write_stanza_5
-    prompt: Identify 4 symbolic interpretations of hotdogs in human culture (e.g.
-      comfort, nostalgia, urban grit, indulgence). Each symbol should be phrased as
-      a standalone metaphorical association.
-  plan_poem_structure:
+    - compose_main_melody
+    - create_chord_progression
+    prompt: Specify a musical key and tempo (BPM) that evokes avian qualities (lightness,
+      freedom, etc.)
+  compose_main_melody:
     agent: false
-    description: Define poem parameters and stanza development
-    name: plan_poem_structure
+    description: Develop primary melodic motif
+    name: compose_main_melody
     nodes_depended_on:
-    - brainstorm_hotdog_themes
+    - choose_key_and_tempo
     nodes_dependent_on:
-    - write_stanza_1
-    - write_stanza_2
-    - write_stanza_3
-    - write_stanza_4
-    - write_stanza_5
-    - write_conclusion_stanza
-    prompt: 'Design the poem''s architecture: specify total stanzas, lines per stanza,
-      metrical pattern, and suggested emotional progression (e.g., 5 quatrains with
-      ABAB rhyme, moving from nostalgic to celebratory).'
-  review_and_refine_conclusion:
+    - decide_song_structure
+    - create_harmonies
+    prompt: Compose a melodic line in the specified key that reflects avian qualities
+      (light, flowing motion)
+  create_chord_progression:
     agent: false
-    description: Analyze and improve conclusion
-    name: review_and_refine_conclusion
+    description: Establish harmonic foundation
+    name: create_chord_progression
     nodes_depended_on:
-    - write_conclusion_stanza
-    - review_and_refine_stanza_5
+    - choose_key_and_tempo
     nodes_dependent_on:
-    - assemble_final_poem
-    prompt: Evaluate the conclusion stanza's resolution of themes and emotional trajectory.
-      Suggest 2-3 targeted revisions to improve closure or poetic impact while preserving
-      structural requirements.
-  review_and_refine_stanza_1:
+    - arrange_sections
+    prompt: Design a chord progression in the selected key that supports lyrical themes
+      and melodic contour
+  create_chorus_lyrics:
     agent: false
-    description: Analyze and improve first stanza
-    name: review_and_refine_stanza_1
+    description: Write central repeating lyrical motif
+    name: create_chorus_lyrics
     nodes_depended_on:
-    - write_stanza_1
+    - brainstorm_bird_themes
+    nodes_dependent_on:
+    - decide_song_structure
+    - compose_main_melody
+    prompt: Develop a memorable chorus emphasizing the most powerful bird-related
+      themes
+  create_harmonies:
+    agent: false
+    description: Develop vocal/instrumental harmonic support
+    name: create_harmonies
+    nodes_depended_on:
+    - compose_main_melody
+    - create_chorus_lyrics
+    nodes_dependent_on:
+    - arrange_sections
+    prompt: Design harmonic layers that complement the main melody and lyrical focus
+  create_verse_lyrics:
+    agent: false
+    description: Write narrative verses based on bird themes
+    name: create_verse_lyrics
+    nodes_depended_on:
+    - brainstorm_bird_themes
+    nodes_dependent_on:
+    - decide_song_structure
+    prompt: Compose 2-3 verses using concrete bird imagery and thematic elements from
+      the brainstorm
+  decide_song_structure:
+    agent: false
+    description: Define pattern of sections (verse, chorus, bridge, etc.)
+    name: decide_song_structure
+    nodes_depended_on:
+    - create_verse_lyrics
+    - create_chorus_lyrics
+    - compose_main_melody
+    nodes_dependent_on:
+    - arrange_sections
+    prompt: Map out a 3-4 minute song structure using existing lyrical components
+      and melodic phrases
+  finalize_lyrics:
+    agent: false
+    description: Polish and synchronize all lyrical elements
+    name: finalize_lyrics
+    nodes_depended_on:
+    - create_verse_lyrics
+    - create_chorus_lyrics
+    - write_bridge
+    nodes_dependent_on:
+    - add_instrumentation
+    - add_harmonies
+    prompt: Refine rhyme schemes, syllabic flow, and thematic consistency across all
+      lyrical sections
+  produce_song:
+    agent: false
+    description: Prepare final song recording
+    name: produce_song
+    nodes_depended_on:
+    - review_and_revise
     nodes_dependent_on: []
-    prompt: Evaluate stanza 1 for metrical accuracy, emotional impact, and connection
-      to themes. Suggest 2-3 specific revisions to enhance imagery or symbolic resonance
-      without altering the core content.
-  review_and_refine_stanza_2:
+    prompt: Compile all elements into a polished production with appropriate FX and
+      mixing
+  review_and_revise:
     agent: false
-    description: Analyze and improve second stanza
-    name: review_and_refine_stanza_2
+    description: Evaluate and optimize song elements
+    name: review_and_revise
     nodes_depended_on:
-    - write_stanza_2
-    nodes_dependent_on: []
-    prompt: Evaluate stanza 2 for thematic consistency and structural adherence. Suggest
-      2-3 specific revisions to strengthen cultural references or metaphorical connections
-      while maintaining existing scope.
-  review_and_refine_stanza_3:
-    agent: false
-    description: Analyze and improve third stanza
-    name: review_and_refine_stanza_3
-    nodes_depended_on:
-    - write_stanza_3
-    nodes_dependent_on: []
-    prompt: Assess stanza 3 for sensory description and structural integrity. Propose
-      2-3 specific revisions to enhance anatomical detail or symbolic association
-      without changing the core framework.
-  review_and_refine_stanza_4:
-    agent: false
-    description: Analyze and improve fourth stanza
-    name: review_and_refine_stanza_4
-    nodes_depended_on:
-    - write_stanza_4
-    nodes_dependent_on: []
-    prompt: Evaluate stanza 4 for sensory impact and structural alignment. Suggest
-      2-3 targeted revisions to refine experiential description or symbolic mapping
-      while preserving the established form.
-  review_and_refine_stanza_5:
-    agent: false
-    description: Analyze and improve fifth stanza
-    name: review_and_refine_stanza_5
-    nodes_depended_on:
-    - write_stanza_5
+    - add_instrumentation
+    - add_harmonies
+    - finalize_lyrics
     nodes_dependent_on:
-    - review_and_refine_conclusion
-    prompt: Assess stanza 5 for thematic synthesis and structural consistency. Propose
-      2-3 specific revisions to strengthen cumulative meaning or emotional impact
-      while maintaining the core composition.
-  write_conclusion_stanza:
+    - produce_song
+    prompt: Critique lyrical-melodic coherence, dynamic contrast, and thematic impact,
+      noting specific revisions
+  write_bridge:
     agent: false
-    description: Draft final concluding stanza
-    name: write_conclusion_stanza
+    description: Create contrasting transitional section
+    name: write_bridge
     nodes_depended_on:
-    - plan_poem_structure
-    - write_stanza_5
+    - brainstorm_bird_themes
+    - decide_song_structure
     nodes_dependent_on:
-    - review_and_refine_conclusion
-    prompt: Write a 4-line closing stanza that reflects on the cumulative themes,
-      incorporating at least one new metaphor and resolving the poem's emotional trajectory
-      while preserving structural consistency.
-  write_stanza_1:
-    agent: false
-    description: Compose opening stanza with thematic foundation
-    name: write_stanza_1
-    nodes_depended_on:
-    - plan_poem_structure
-    - generate_visual_imagery
-    - incorporate_symbolism
-    nodes_dependent_on:
-    - review_and_refine_stanza_1
-    prompt: Write a self-contained 4-line stanza introducing hotdogs as a thematic
-      focus, incorporating 1 visual image and 1 symbolic element while adhering to
-      the specified structure.
-  write_stanza_2:
-    agent: false
-    description: Develop cultural significance layer
-    name: write_stanza_2
-    nodes_depended_on:
-    - plan_poem_structure
-    - generate_visual_imagery
-    - incorporate_symbolism
-    nodes_dependent_on:
-    - review_and_refine_stanza_2
-    prompt: Write a 4-line stanza exploring hotdogs in social contexts (e.g., baseball
-      games, street vendors), using 1 visual example and 1 symbolic concept from earlier
-      steps, maintaining structural consistency.
-  write_stanza_3:
-    agent: false
-    description: Describe physical form and components
-    name: write_stanza_3
-    nodes_depended_on:
-    - plan_poem_structure
-    - generate_visual_imagery
-    - incorporate_symbolism
-    nodes_dependent_on:
-    - review_and_refine_stanza_3
-    prompt: Write a 4-line stanza focused on the anatomy of a hotdog (bun, sausage,
-      toppings), embedding at least 1 visual detail and 1 symbolic interpretation
-      while conforming to the planned meter and rhyme.
-  write_stanza_4:
-    agent: false
-    description: Explore sensory experience
-    name: write_stanza_4
-    nodes_depended_on:
-    - plan_poem_structure
-    - generate_visual_imagery
-    - incorporate_symbolism
-    nodes_dependent_on:
-    - review_and_refine_stanza_4
-    prompt: Write a 4-line stanza capturing the taste, smell, and warmth of hotdogs,
-      incorporating 1 imagery element and 1 symbolic mapping, keeping structural elements
-      consistent.
-  write_stanza_5:
-    agent: false
-    description: Conclude thematic development
-    name: write_stanza_5
-    nodes_depended_on:
-    - plan_poem_structure
-    - generate_visual_imagery
-    - incorporate_symbolism
-    nodes_dependent_on:
-    - review_and_refine_stanza_5
-    - write_conclusion_stanza
-    prompt: Compose the penultimate stanza synthesizing previous themes, using 2 visual
-      elements and 2 symbolic concepts while maintaining the established structure
-      and advancing the poem's emotional arc.
+    - finalize_lyrics
+    prompt: Compose a bridge that introduces new thematic or melodic elements related
+      to bird imagery
