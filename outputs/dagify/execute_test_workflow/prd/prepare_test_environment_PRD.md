@@ -1,38 +1,35 @@
 # prepare_test_environment PRD
 
 ## Description
-Automates the provisioning, configuration, and validation of the entire testing infrastructure—hardware, software, network, and isolation layers—ensuring a repeatable, compliant environment that satisfies the test scope constraints.
+Automates the end‑to‑end provisioning, configuration, isolation, and validation of a test environment that strictly adheres to the test scope defined by the parent node, guaranteeing repeatability, compliance, and readiness for test execution.
 
 
 ## Conceptual Info
 
-This node is the gatekeeper that guarantees a consistent, reliable, and compliant test environment before any test data or cases are introduced. It abstracts the complexities of infrastructure provisioning into a single, repeatable step, thereby reducing manual errors, speeding up test cycles, and enabling continuous integration pipelines to run smoothly.
+The prepare_test_environment node is the gatekeeper that guarantees a consistent, reliable, and compliant test environment before any test data or cases are introduced. It abstracts the complexities of infrastructure provisioning into a single, repeatable step, thereby reducing manual errors, speeding up test cycles, and enabling continuous integration pipelines to run smoothly.
 
 ## Docstring
 
 ### Summary
-Provision, configure, and validate the testing environment based on a predefined test scope.
+Provision, configure, isolate, and validate the testing environment based on the test scope.
 
 ### Parameters
 
-- **scope** (dict): Dictionary containing test objectives, required resources, and success criteria as produced by the 'identify_test_scope' node.
+- **test_scope** (dict): Structured test scope JSON output from identify_test_scope, containing goals, boundaries, success_criteria, and summary.
 
 ### Returns
 
-dict: Structured JSON with setup steps, installed software, hardware configuration, validation results, and a summary.
+dict: JSON object containing setup_steps, installed_software, hardware_configuration, validation_steps, validation_results, and environment_summary.
 
 ### Raises
 
-- EnvironmentProvisionError: Raised if hardware allocation fails or required quota is exceeded.
-- SoftwareInstallationError: Raised when a critical dependency cannot be installed or verified.
-- ValidationFailedError: Raised when any validation step reports a failure.
+- ProvisioningError: Raised when hardware or software provisioning fails after exhaustive retries.
+- ValidationError: Raised when one or more validation steps fail after attempted remediation.
 
 ### Examples
 
 ```python
->>> from workflow.nodes.prepare_test_environment import prepare_test_environment
->>> # Assume 'scope' dict obtained from identify_test_scope node
->>> result = prepare_test_environment(scope)
->>> print(result['environment_summary'])
-"Environment ready: 8 vCPUs, 32GB RAM, PostgreSQL 13.4, all validations passed."
+>>> test_scope = {"goals": [...], "boundaries": [...], "success_criteria": [...], "summary": "..."}
+>>> result = prepare_test_environment(test_scope)
+{"setup_steps": [...], "installed_software": [...], "hardware_configuration": [...], "validation_steps": [...], "validation_results": [...], "environment_summary": "Ready."}
 ```

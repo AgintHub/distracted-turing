@@ -1,36 +1,40 @@
 # run_test_scenarios PRD
 
 ## Description
-Orchestrates the systematic execution of every test case in the suite, capturing raw logs, pass/fail status, and performance metrics in a deterministic, reproducible manner.
+Orchestrates the deterministic execution of a full test suite, aggregating low‑level artifacts such as raw logs, pass/fail status, and precise timing metrics for downstream analytics.
 
 
 ## Conceptual Info
 
-The run_test_scenarios node acts as the execution engine for the test suite. It consumes the fully prepared test environment from execute_test_setup, iteratively runs each test case, and aggregates low‑level execution artifacts. These artifacts are later used by reporting and analytics nodes to generate summaries, detect regressions, and measure performance trends.
+The run_test_scenarios node is the core execution engine that transforms a prepared test environment into a reproducible record of test performance and outcomes. It captures granular execution artifacts that enable downstream reporting, regression analysis, and performance trend monitoring.
 
 ## Docstring
 
 ### Summary
-Execute all test cases and return raw execution data.
+Execute a list of test cases within a pre‑configured environment and return deterministic, machine‑readable execution metadata.
 
 ### Parameters
 
-- **environment_id** (str): Identifier of the test environment prepared by execute_test_setup.
-- **test_cases** (List[dict]): A list of test case definitions, each containing an 'id' and execution command or reference.
+- **environment_id** (str): Unique identifier of the prepared test environment returned by execute_test_setup.
+- **test_case_ids** (List[str]): Ordered list of test case identifiers to run.
+- **timeout_seconds** (float): Maximum allowed wall‑clock time for any single test case before it is forcefully terminated.
 
 ### Returns
 
-dict: A dictionary containing lists of test_case_ids, execution_status, execution_logs, and execution_times_seconds.
+dict: Dictionary containing four lists: test_case_ids, execution_status, execution_logs, execution_times_seconds, all of equal length.
 
 ### Raises
 
-- RuntimeError: Raised if the environment_id is invalid or the test environment is not ready.
-- TimeoutError: Raised when a test case exceeds its allocated timeout threshold.
+- RuntimeError: Raised if the environment_id is missing or the test harness invocation fails to start.
+- ValueError: Raised if test_case_ids is empty or contains duplicates.
 
 ### Examples
 
 ```python
->>> results = run_test_scenarios(environment_id='env_123', test_cases=[{'id':'tc01','cmd':'pytest -k tc01'}, {'id':'tc02','cmd':'pytest -k tc02'}])
+>>> results = run_test_scenarios(
+...     environment_id='env-123',
+...     test_case_ids=['tc1', 'tc2', 'tc3'],
+...     timeout_seconds=120.0)
 >>> print(results['execution_status'])
-[True, False]
+[True, False, True]
 ```

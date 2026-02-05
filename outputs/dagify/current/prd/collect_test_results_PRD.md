@@ -1,35 +1,35 @@
 # collect_test_results PRD
 
 ## Description
-Gathers, processes, and consolidates raw test execution outputs, including detailed logs, error messages, and performance metrics from the test run, providing a comprehensive test result summary.
+Aggregates raw execution logs, error traces, and performance metrics from a test run, categorizes and aggregates the data, and provides a concise summary for quick insight.
 
 
 ## Conceptual Info
 
-This node aggregates and documents test execution outputs to facilitate analysis and reporting, providing insights into test effectiveness, performance, and reliability.
+The collect_test_results node functions as the central intelligence layer of the testing pipeline, transforming low‑level execution artefacts into a coherent, actionable knowledge base. By systematically normalising logs, classifying failures, and summarising performance, it enables downstream reporting, root‑cause analysis, and continuous improvement initiatives.
 
 ## Docstring
 
 ### Summary
-Collects and processes test execution outputs, including logs, errors, and performance metrics, and returns them in a structured format.
+Aggregates and normalises test execution artifacts into a structured report.
 
 ### Parameters
 
-- **test_run_id** (str): Unique identifier for the test run.
+- **test_output** (dict): Dictionary containing raw logs, error traces, and metric snapshots produced by the test harness.
 
 ### Returns
 
-dict: A dictionary containing the collected test execution outputs, including logs, errors, and performance metrics.
+dict: A dictionary with keys 'execution_logs', 'error_messages', 'performance_metrics', and 'log_summary' as described in the output structure.
 
 ### Raises
 
-- TestRunNotFoundError: Raised when the specified test run ID is not found.
+- ValueError: Raised if the input dictionary lacks required keys or contains malformed data.
 
 ### Examples
 
 ```python
->>> test_run_id = 'TR-123'
->>> results = collect_test_results(test_run_id)
->>> print(results['execution_logs'])
-['2023-02-20 14:30:00 INFO: Test started', '2023-02-20 14:30:05 ERROR: Test failed']
+>>> from collect_test_results import collect_test_results
+>>> result = collect_test_results(test_output)
+>>> print(result['log_summary'])
+"3 errors encountered: 2 AssertionErrors, 1 TimeoutError. Average response time 120.4ms exceeded the 100ms threshold."
 ```

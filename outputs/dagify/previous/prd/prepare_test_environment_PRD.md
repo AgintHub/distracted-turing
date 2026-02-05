@@ -1,71 +1,38 @@
 # prepare_test_environment PRD
 
 ## Description
-Configure testing infrastructure and dependencies
+Automates the provisioning, configuration, and validation of the entire testing infrastructure—hardware, software, network, and isolation layers—ensuring a repeatable, compliant environment that satisfies the test scope constraints.
 
 
 ## Conceptual Info
 
-This node is responsible for provisioning the hardware, installing required software, configuring network and system settings, and validating the setup before any test data is generated or test cases are executed.
+This node is the gatekeeper that guarantees a consistent, reliable, and compliant test environment before any test data or cases are introduced. It abstracts the complexities of infrastructure provisioning into a single, repeatable step, thereby reducing manual errors, speeding up test cycles, and enabling continuous integration pipelines to run smoothly.
 
 ## Docstring
 
 ### Summary
-Prepares the test environment by installing software, allocating hardware resources, configuring settings, and validating the setup.
+Provision, configure, and validate the testing environment based on a predefined test scope.
 
 ### Parameters
 
-- **scope_goals** (List[str]): List of high‑level objectives derived from identify_test_scope that influence which components must be installed or configured.
-- **scope_boundaries** (List[str]): List of constraints that limit the environment (e.g., no external network access, limited RAM).
-- **scope_success_criteria** (List[str]): Success conditions that must be met for the environment to be considered ready.
+- **scope** (dict): Dictionary containing test objectives, required resources, and success criteria as produced by the 'identify_test_scope' node.
 
 ### Returns
 
-Dict[str, Union[List[str], List[bool], str]]: Dictionary containing the ordered setup actions, installed software list, hardware configuration details, validation results, validation steps, and a concise environment summary.
+dict: Structured JSON with setup steps, installed software, hardware configuration, validation results, and a summary.
 
 ### Raises
 
-- RuntimeError: Raised if any critical validation step fails, indicating that the environment is not ready for testing.
-- ValueError: Raised when input lists are empty or contain invalid entries.
+- EnvironmentProvisionError: Raised if hardware allocation fails or required quota is exceeded.
+- SoftwareInstallationError: Raised when a critical dependency cannot be installed or verified.
+- ValidationFailedError: Raised when any validation step reports a failure.
 
 ### Examples
 
 ```python
->>> env = prepare_test_environment(
-
-...     scope_goals=["Verify API throughput"],
-
-...     scope_boundaries=["No external network"],
-
-...     scope_success_criteria=["All services respond within 200ms"]
-
->>> )
-{
-  "setup_steps": ["install docker", "configure network", "start services"],
-  "installed_software": ["Docker 20.10", "Python 3.11"],
-  "hardware_configuration": ["8 CPU cores", "16GB RAM"],
-  "validation_results": [true, true, true],
-  "validation_steps": ["check docker running", "ping localhost", "service health check"],
-  "environment_summary": "Environment ready: all services operational and meeting latency targets."
-}
-```
-
-```python
->>> env = prepare_test_environment(
-
-...     scope_goals=["Load‑test database"],
-
-...     scope_boundaries=["No external network", "GPU not available"],
-
-...     scope_success_criteria=["Database replicas reachable"]
-
->>> )
-{
-  "setup_steps": ["install postgres", "configure replication"],
-  "installed_software": ["PostgreSQL 15"],
-  "hardware_configuration": ["4 CPU cores", "8GB RAM"],
-  "validation_results": [true, true],
-  "validation_steps": ["check postgres service", "replication health"],
-  "environment_summary": "Environment ready: PostgreSQL cluster operational."
-}
+>>> from workflow.nodes.prepare_test_environment import prepare_test_environment
+>>> # Assume 'scope' dict obtained from identify_test_scope node
+>>> result = prepare_test_environment(scope)
+>>> print(result['environment_summary'])
+"Environment ready: 8 vCPUs, 32GB RAM, PostgreSQL 13.4, all validations passed."
 ```
