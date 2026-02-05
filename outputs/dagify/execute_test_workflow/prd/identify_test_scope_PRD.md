@@ -1,40 +1,34 @@
 # identify_test_scope PRD
 
 ## Description
-Outline the objectives and scope of the test by specifying clear goals, defining what is in‑scope and out‑of‑scope, and establishing measurable success criteria.
+Defines the strategic framework for a test run by specifying explicit goals, scope boundaries, measurable success criteria, and a concise summary that guides test case creation and environment setup.
 
 
 ## Conceptual Info
 
-The identify_test_scope node defines the strategic framework for a test run. It captures the intent, constraints, and acceptance metrics that guide downstream test case creation and environment configuration.
+The identify_test_scope node establishes the strategic vision for a test cycle. It captures the intent, constraints, and acceptance metrics that direct subsequent test design, environment provisioning, and execution planning.
 
 ## Docstring
 
 ### Summary
-Define the objectives, boundaries, and success criteria for a software test.
+Generate a structured definition of test objectives, boundaries, and success criteria.
 
 ### Parameters
 
-- **input_text** (str): Free‑form textual description of the testing intent or high‑level requirement.
+- **context** (dict): Optional contextual information such as business goals, regulatory mandates, or prior test results that influence scope definition.
 
 ### Returns
 
-Dict[str, Any]: A dictionary containing four keys: 'goals' (list of strings), 'boundaries' (list of strings), 'success_criteria' (list of strings), and 'summary' (string).
+dict: A dictionary with keys 'goals', 'boundaries', 'success_criteria', and 'summary', each containing the respective scoped content.
 
 ### Raises
 
-- ValueError: If input_text is empty or not a string.
+- ValueError: Raised if required contextual information is missing or insufficient to define a coherent scope.
 
 ### Examples
 
 ```python
->>> scope = identify_test_scope("Verify authentication flows for the admin portal.")
+>>> scope = identify_test_scope(context={'business_goal': 'reduce API latency'})
 >>> print(scope['summary'])
-"Verification of admin authentication mechanisms, including login, logout, and session handling."
-```
-
-```python
->>> scope = identify_test_scope("Test performance of the search API under load.")
->>> print(scope['goals'])
-["Measure query latency", "Validate throughput", "Ensure error rate < 0.1%"]
+The test focuses on API latency reduction, targeting a 20% improvement over the current baseline.
 ```

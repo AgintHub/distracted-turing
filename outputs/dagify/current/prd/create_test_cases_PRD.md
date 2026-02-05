@@ -1,36 +1,40 @@
 # create_test_cases PRD
 
 ## Description
-Develop detailed test scenarios and procedures based on the provided test scope.
+Generates a complete, structured list of test cases derived from the defined test scope, ensuring coverage of all objectives, constraints, and success criteria.
 
 
 ## Conceptual Info
 
-This node is responsible for generating detailed test cases based on the defined test scope, including steps, input data requirements, and expected outcomes.
+This node translates high‑level test goals and constraints into actionable, traceable test cases that can be directly executed by QA teams or automated frameworks. It ensures that every requirement is validated, reduces ambiguity, and provides a clear audit trail from scope to execution.
 
 ## Docstring
 
 ### Summary
-Generate test cases based on the provided test scope.
+Create detailed test case descriptions from a test scope definition.
 
 ### Parameters
 
-- **test_scope** (dict): Test scope definition including goals, boundaries, and success criteria.
+- **scope_json** (dict): Dictionary containing 'goals', 'boundaries', 'success_criteria', and 'summary' keys as produced by identify_test_scope.
 
 ### Returns
 
-dict: A dictionary containing the list of test cases and the total number of test cases generated.
+tuple[List[str], int]: A tuple containing the list of test case descriptions and the total count.
 
 ### Raises
 
-- ValueError: If the test scope is not properly defined or is missing required information.
+- ValueError: Raised when required keys are missing or malformed in the input scope.
 
 ### Examples
 
 ```python
->>> test_scope = {'goals': ['Test goal 1', 'Test goal 2'],
-...               'boundaries': ['Boundary 1', 'Boundary 2'],
-...               'success_criteria': ['Criteria 1', 'Criteria 2']}
->>> test_cases, total_cases = create_test_cases(test_scope)
-{'test_cases': ['Test case 1', 'Test case 2'], 'total_cases': 2}
+>>> scope = {
+...     "goals": ["Verify login", "Ensure data persistence"],
+...     "boundaries": ["Maximum input length", "Null value handling"],
+...     "success_criteria": ["Login succeeds in 2s", "Data remains after restart"],
+...     "summary": "Login and persistence test scope."
+>>> }
+>>> test_cases, count = create_test_cases(scope)
+['Test 1: Valid login within 2s using standard credentials.', 'Test 2: Verify data persistence after application restart.']
+2
 ```

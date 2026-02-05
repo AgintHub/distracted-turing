@@ -1,52 +1,36 @@
 # run_test_scenarios PRD
 
 ## Description
-Execute all defined test cases
+Orchestrates the systematic execution of every test case in the suite, capturing raw logs, pass/fail status, and performance metrics in a deterministic, reproducible manner.
 
 
 ## Conceptual Info
 
-The run_test_scenarios node is responsible for orchestrating the execution of every test case defined in the test suite. It leverages the environment prepared by execute_test_setup, runs each test case sequentially, captures the raw logs, determines pass/fail status based on exit codes or assertions, and records the execution time for performance analysis.
+The run_test_scenarios node acts as the execution engine for the test suite. It consumes the fully prepared test environment from execute_test_setup, iteratively runs each test case, and aggregates low‑level execution artifacts. These artifacts are later used by reporting and analytics nodes to generate summaries, detect regressions, and measure performance trends.
 
 ## Docstring
 
 ### Summary
-Run all test cases and return raw execution data.
+Execute all test cases and return raw execution data.
 
 ### Parameters
 
-- **environment_id** (str): Unique identifier of the prepared test execution environment returned by execute_test_setup.
-- **test_cases** (List[str]): A list of test case identifiers or script paths to be executed.
-- **setup_steps** (List[str]): Ordered list of configuration actions performed during setup, used for contextual logging.
+- **environment_id** (str): Identifier of the test environment prepared by execute_test_setup.
+- **test_cases** (List[dict]): A list of test case definitions, each containing an 'id' and execution command or reference.
 
 ### Returns
 
-Dict[str, List[Any]]: A dictionary containing four keys: 'test_case_ids', 'execution_status', 'execution_logs', and 'execution_times_seconds', each a list aligned by test case order.
+dict: A dictionary containing lists of test_case_ids, execution_status, execution_logs, and execution_times_seconds.
 
 ### Raises
 
-- RuntimeError: If the environment is not ready or a critical setup step failed.
-- FileNotFoundError: If a specified test case file is missing.
-- Exception: For any unexpected errors during test execution.
+- RuntimeError: Raised if the environment_id is invalid or the test environment is not ready.
+- TimeoutError: Raised when a test case exceeds its allocated timeout threshold.
 
 ### Examples
 
 ```python
->>> result = run_test_scenarios(
-...     environment_id='env_123',
-...     test_cases=['tc1.sh', 'tc2.sh'],
-...     setup_steps=['install deps', 'configure network']
->>> )
->>> print(result['execution_status'])
+>>> results = run_test_scenarios(environment_id='env_123', test_cases=[{'id':'tc01','cmd':'pytest -k tc01'}, {'id':'tc02','cmd':'pytest -k tc02'}])
+>>> print(results['execution_status'])
 [True, False]
-```
-
-```python
->>> result = run_test_scenarios(
-...     environment_id='env_456',
-...     test_cases=['tc3.py'],
-...     setup_steps=['setup env']
->>> )
->>> print(result['execution_times_seconds'])
-[2.34]
 ```

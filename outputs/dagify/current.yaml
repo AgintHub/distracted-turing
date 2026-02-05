@@ -4,7 +4,9 @@ name: execute_test_workflow
 nodes:
   analyze_test_results:
     agent: false
-    description: Assess test outcomes against criteria
+    description: Performs an objective, rule-based assessment of test outcomes, comparing
+      actual results to expected criteria and aggregating pass/fail metrics without
+      providing remediation guidance.
     name: analyze_test_results
     nodes_depended_on:
     - collect_test_results
@@ -29,73 +31,66 @@ nodes:
       key: overall_pass
       type: bool
     prd:
-      conceptual_info: The node evaluates the raw test execution data produced by
-        the test framework, compares each test case's actual outcome to its expected
-        result, and aggregates the results into a concise report. It provides an objective
-        pass/fail assessment of the entire test suite without offering remediation
-        suggestions.
+      conceptual_info: The analyze_test_results node ingests raw execution data from
+        collect_test_results, interprets expected versus actual outcomes per test
+        case, and compiles a concise, deterministic report. It is deliberately devoid
+        of any recommendation or remedial content, ensuring that downstream nodes
+        receive a clean pass/fail verdict for further processing or reporting.
       docstring:
         examples:
         - lines:
-          - result = analyze_test_results(
-          - '    execution_logs=["TC1 PASS", "TC2 FAIL"],'
-          - '    error_messages=["", "AssertionError: expected 200 but got 500"],'
-          - '    performance_metrics=[0.12, 0.15],'
-          - '    log_summary="2 tests executed, 1 failure."'
-          - )
-          output: '{''summary'': ''1 failure out of 2 tests.'', ''total_tests'': 2,
-            ''passed_tests'': 1, ''failed_tests'': 1, ''failed_test_ids'': [''TC2''],
-            ''overall_pass'': False}'
-        - lines:
-          - result = analyze_test_results(
-          - '    execution_logs=["TC1 PASS", "TC2 PASS"],'
-          - '    error_messages=["", ""],'
-          - '    performance_metrics=[0.10, 0.08],'
-          - '    log_summary="2 tests executed, no failures."'
-          - )
-          output: '{''summary'': ''All tests passed.'', ''total_tests'': 2, ''passed_tests'':
-            2, ''failed_tests'': 0, ''failed_test_ids'': [], ''overall_pass'': True}'
+          - result = analyze_test_results(execution_logs, error_messages, performance_metrics)
+          - print(result['overall_pass'])
+          output: True or False depending on test outcomes.
         parameters:
-        - description: Raw log entries captured during test execution, one per test
-            case.
+        - description: Raw log entries captured during the test run.
           name: execution_logs
           type: List[str]
-        - description: Error messages or exception traces associated with each test
-            case.
+        - description: Error messages or exception traces generated during execution.
           name: error_messages
           type: List[str]
-        - description: Numeric performance measurements (e.g., response times) for
-            each test case.
+        - description: Numeric performance measurements recorded for the test run.
           name: performance_metrics
           type: List[float]
-        - description: A brief textual summary of the collected logs and errors.
-          name: log_summary
-          type: str
         raises:
-        - description: If any of the input lists are of mismatched lengths or empty.
+        - description: Raised if input lists have mismatched lengths or if expected
+            outcome metadata cannot be parsed.
           type: ValueError
         returns:
-          description: 'A dictionary containing the following keys:
-
-            - summary (str): A short narrative of overall test outcomes.
-
-            - total_tests (int): Number of test cases processed.
-
-            - passed_tests (int): Number of test cases that passed.
-
-            - failed_tests (int): Number of test cases that failed.
-
-            - failed_test_ids (List[str]): Identifiers of failed test cases.
-
-            - overall_pass (bool): True if every test passed, otherwise False.'
-          type: Dict[str, Any]
-        summary: Analyze test results and produce an objective pass/fail summary.
-    prompt: Compare actual test results with expected outcomes, identify deviations,
-      and classify them as pass/fail. Provide objective analysis without recommendations.
+          description: A dictionary containing summary, total_tests, passed_tests,
+            failed_tests, failed_test_ids, and overall_pass.
+          type: dict
+        summary: Objective analysis of test execution data, producing aggregate pass/fail
+          metrics.
+    prompt: "You are tasked with performing a rigorous, objective analysis of the\
+      \ test execution data supplied by the **collect_test_results** node.\n\nThe\
+      \ input will consist of three parallel lists:\n1. **execution_logs** – raw log\
+      \ entries per test case.\n2. **error_messages** – any exception traces or failure\
+      \ notes.\n3. **performance_metrics** – numeric values such as response time\
+      \ and memory usage.\n\nYour objective is to:\n\n1. **Parse** each test case's\
+      \ expected outcome embedded in the log metadata.\n2. **Determine** the actual\
+      \ outcome: *Passed* if the actual result matches the expected, *Failed* otherwise.\n\
+      3. **Aggregate** the results to produce:\n   - A concise textual *summary* highlighting\
+      \ overall pass rate and notable anomalies.\n   - Counts of total, passed, and\
+      \ failed test cases.\n   - A list of identifiers (or names) for any failed test\
+      \ cases.\n   - An overall boolean flag indicating whether the entire suite passed.\n\
+      \n**Constraints & Requirements**\n- Do not generate any remediation or recommendation\
+      \ text.\n- All outputs must be deterministic and reproducible.\n- Preserve the\
+      \ output structure exactly as specified below.\n\n**Output Format** (JSON):\n\
+      ```json\n{\n  \"summary\": \"<text>\",\n  \"total_tests\": <int>,\n  \"passed_tests\"\
+      : <int>,\n  \"failed_tests\": <int>,\n  \"failed_test_ids\": [\"<id>\", ...],\n\
+      \  \"overall_pass\": <bool>\n}\n```\nEnsure that the JSON keys match the names\
+      \ exactly and that data types align with the defined primitives.\n\n*Example*:\
+      \ If 100 tests are run, 92 pass, 8 fail with IDs `TC-001`, `TC-003`, …, the\
+      \ output would be:\n```json\n{\n  \"summary\": \"Out of 100 tests, 92 passed\
+      \ and 8 failed. 8 failures observed.\",\n  \"total_tests\": 100,\n  \"passed_tests\"\
+      : 92,\n  \"failed_tests\": 8,\n  \"failed_test_ids\": [\"TC-001\", \"TC-003\"\
+      , ...],\n  \"overall_pass\": false\n}\n```"
   collect_test_results:
     agent: false
-    description: Gather raw test execution outputs, including logs, error messages,
-      and performance metrics, from the test run.
+    description: Gathers, processes, and consolidates raw test execution outputs,
+      including detailed logs, error messages, and performance metrics from the test
+      run, providing a comprehensive test result summary.
     name: collect_test_results
     nodes_depended_on:
     - execute_test_teardown
@@ -116,37 +111,41 @@ nodes:
       type: str
     prd:
       conceptual_info: This node aggregates and documents test execution outputs to
-        facilitate analysis and reporting.
+        facilitate analysis and reporting, providing insights into test effectiveness,
+        performance, and reliability.
       docstring:
         examples:
         - lines:
-          - 'test_run_outputs = {''logs'': [''log1'', ''log2''], ''errors'': [''error1''],
-            ''performance_metrics'': [1.2, 3.4]}'
-          - collected_outputs = collect_test_results(test_run_outputs)
-          output: '{''execution_logs'': [''log1'', ''log2''], ''error_messages'':
-            [''error1''], ''performance_metrics'': [1.2, 3.4], ''log_summary'': ''Collected
-            2 logs, 1 error, and 2 performance metrics.''}'
+          - test_run_id = 'TR-123'
+          - results = collect_test_results(test_run_id)
+          - print(results['execution_logs'])
+          output: '[''2023-02-20 14:30:00 INFO: Test started'', ''2023-02-20 14:30:05
+            ERROR: Test failed'']'
         parameters:
-        - description: Dictionary containing test run outputs, including logs, errors,
-            and performance metrics.
-          name: test_run_outputs
-          type: dict
+        - description: Unique identifier for the test run.
+          name: test_run_id
+          type: str
         raises:
-        - description: If the test_run_outputs dictionary is empty or missing required
-            keys.
-          type: ValueError
+        - description: Raised when the specified test run ID is not found.
+          type: TestRunNotFoundError
         returns:
-          description: Dictionary containing the collected test execution outputs,
-            including logs, errors, performance metrics, and a log summary.
+          description: A dictionary containing the collected test execution outputs,
+            including logs, errors, and performance metrics.
           type: dict
-        summary: Collects test execution outputs, including logs, errors, and performance
-          metrics, and returns them in a structured format.
+        summary: Collects and processes test execution outputs, including logs, errors,
+          and performance metrics, and returns them in a structured format.
     prompt: Extract, organize, and document all test execution output logs, error
-      messages, and performance metrics from the test run.
+      messages, and performance metrics from the test run, ensuring data is properly
+      formatted and easily accessible for analysis and reporting. Specifically, collect
+      and process raw logs, categorize error messages by severity and type, and calculate
+      key performance indicators such as execution times, memory usage, and throughput.
+      Include a brief textual summary of the collected logs and errors, highlighting
+      any critical issues or trends that require attention.
   create_test_cases:
     agent: false
-    description: Develop detailed test scenarios and procedures based on the provided
-      test scope.
+    description: Generates a complete, structured list of test cases derived from
+      the defined test scope, ensuring coverage of all objectives, constraints, and
+      success criteria.
     name: create_test_cases
     nodes_depended_on:
     - identify_test_scope
@@ -160,39 +159,61 @@ nodes:
       key: total_cases
       type: int
     prd:
-      conceptual_info: This node is responsible for generating detailed test cases
-        based on the defined test scope, including steps, input data requirements,
-        and expected outcomes.
+      conceptual_info: This node translates high‑level test goals and constraints
+        into actionable, traceable test cases that can be directly executed by QA
+        teams or automated frameworks. It ensures that every requirement is validated,
+        reduces ambiguity, and provides a clear audit trail from scope to execution.
       docstring:
         examples:
         - lines:
-          - 'test_scope = {''goals'': [''Test goal 1'', ''Test goal 2''],'
-          - '              ''boundaries'': [''Boundary 1'', ''Boundary 2''],'
-          - '              ''success_criteria'': [''Criteria 1'', ''Criteria 2'']}'
-          - test_cases, total_cases = create_test_cases(test_scope)
-          output: '{''test_cases'': [''Test case 1'', ''Test case 2''], ''total_cases'':
-            2}'
+          - scope = {
+          - '    "goals": ["Verify login", "Ensure data persistence"],'
+          - '    "boundaries": ["Maximum input length", "Null value handling"],'
+          - '    "success_criteria": ["Login succeeds in 2s", "Data remains after
+            restart"],'
+          - '    "summary": "Login and persistence test scope."'
+          - '}'
+          - test_cases, count = create_test_cases(scope)
+          output: '[''Test 1: Valid login within 2s using standard credentials.'',
+            ''Test 2: Verify data persistence after application restart.'']
+
+            2'
         parameters:
-        - description: Test scope definition including goals, boundaries, and success
-            criteria.
-          name: test_scope
+        - description: Dictionary containing 'goals', 'boundaries', 'success_criteria',
+            and 'summary' keys as produced by identify_test_scope.
+          name: scope_json
           type: dict
         raises:
-        - description: If the test scope is not properly defined or is missing required
-            information.
+        - description: Raised when required keys are missing or malformed in the input
+            scope.
           type: ValueError
         returns:
-          description: A dictionary containing the list of test cases and the total
-            number of test cases generated.
-          type: dict
-        summary: Generate test cases based on the provided test scope.
-    prompt: Write specific test case steps, input data requirements, and expected
-      outcomes aligned with the defined test scope. List test cases as numbered items
-      with clear instructions.
+          description: A tuple containing the list of test case descriptions and the
+            total count.
+          type: tuple[List[str], int]
+        summary: Create detailed test case descriptions from a test scope definition.
+    prompt: "You are a test design engineer. Given the structured output from the\
+      \ **identify_test_scope** node, produce a comprehensive set of test cases.\n\
+      \nInput format (JSON):\n```json\n{\n  \"goals\": [\"Goal 1\", \"Goal 2\", ...],\n\
+      \  \"boundaries\": [\"Boundary 1\", \"Boundary 2\", ...],\n  \"success_criteria\"\
+      : [\"Criterion 1\", \"Criterion 2\", ...],\n  \"summary\": \"Brief scope overview\"\
+      \n}\n```\n\n**Output**:\n1. **test_cases** – a numbered list of strings. Each\
+      \ string must describe:\n   * The purpose of the test relative to a specific\
+      \ goal or boundary.\n   * Precise input data requirements (including edge‑case\
+      \ values).\n   * Step‑by‑step actions.\n   * Expected outcome and how it satisfies\
+      \ one or more success criteria.\n2. **total_cases** – the integer count of test\
+      \ cases generated.\n\nThe generated test cases should:\n- Cover all identified\
+      \ goals and boundaries.\n- Include positive, negative, boundary, and performance\
+      \ scenarios.\n- Be written in clear, executable natural language.\n- Avoid duplication;\
+      \ each case should test a distinct condition.\n\nReturn a JSON object exactly\
+      \ matching the `output_structure` below.\n\nExample output:\n```json\n{\n  \"\
+      test_cases\": [\"Test 1: ...\", \"Test 2: ...\"],\n  \"total_cases\": 2\n}\n\
+      ```\n"
   execute_test_setup:
     agent: false
     description: Initialize test execution environment by performing all required
-      pre-test configuration steps, loading test data, and initializing test states.
+      pre-test configuration steps, loading test data, and initializing test states
+      to ensure a stable test environment.
     name: execute_test_setup
     nodes_depended_on:
     - generate_test_data
@@ -215,37 +236,45 @@ nodes:
       type: bool
     prd:
       conceptual_info: This node sets up the environment for test execution by performing
-        necessary configuration steps and loading test data.
+        necessary configuration steps and loading test data generated from the 'generate_test_data'
+        node.
       docstring:
         examples:
         - lines:
-          - test_data = ['data1.csv', 'data2.json']
-          - setup_result = execute_test_setup(test_data)
-          output: '{''environment_id'': ''env-123'', ''setup_steps'': [''install dependencies'',
-            ''configure network''], ''loaded_test_data'': [''data1.csv'', ''data2.json''],
+          - test_data = ['test_data_1.csv', 'test_data_2.json']
+          - test_environment = 'test_environment_1'
+          - setup_result = execute_test_setup(test_data, test_environment)
+          - print(setup_result)
+          output: '{''environment_id'': ''env_1'', ''setup_steps'': [''install dependencies'',
+            ''configure network''], ''loaded_test_data'': [''test_data_1.csv'', ''test_data_2.json''],
             ''environment_ready'': True}'
         parameters:
-        - description: List of test data files or identifiers to be loaded into the
-            environment.
+        - description: List of filenames or identifiers for the generated test data
+            sets.
           name: test_data
           type: List[str]
+        - description: Unique identifier of the test environment to be set up.
+          name: test_environment
+          type: str
         raises:
-        - description: If the environment setup fails due to missing dependencies
-            or configuration issues.
-          type: RuntimeError
+        - description: Raised when the test environment setup fails due to invalid
+            test data or environment configuration issues.
+          type: Exception
         returns:
-          description: A dictionary containing the environment ID, setup steps, loaded
-            test data, and a flag indicating whether the environment is ready for
-            test execution.
+          description: Dictionary containing the environment ID, setup steps, loaded
+            test data, and environment readiness flag.
           type: dict
         summary: Initialize the test environment by setting up required configurations
-          and loading test data.
-    prompt: Perform all required pre-test configuration steps in the testing environment,
-      including loading test data and initializing test states.
+          and loading test data to ensure a stable test environment.
+    prompt: Perform comprehensive pre-test configuration by loading test data generated
+      from the 'generate_test_data' node, initializing required test states, and executing
+      all necessary setup steps to ensure a stable test environment. Validate the
+      environment's readiness and prepare it for test execution.
   execute_test_teardown:
     agent: false
-    description: Reset and clean test environment by removing test artifacts and temporary
-      configurations.
+    description: Orchestrates a comprehensive rollback of the test environment, removing
+      all artifacts and restoring configurations altered during test execution to
+      guarantee isolation and repeatability.
     name: execute_test_teardown
     nodes_depended_on:
     - run_test_scenarios
@@ -263,29 +292,47 @@ nodes:
       key: error_messages
       type: List[str]
     prd:
-      conceptual_info: This node cleans up the test environment after executing test
-        scenarios, ensuring a clean slate for future testing.
+      conceptual_info: The execute_test_teardown node is the final gatekeeper of the
+        test lifecycle, ensuring that every side‑effect produced by the run_test_scenarios
+        node is fully neutralized.  This guarantees that each test run is isolated,
+        repeatable, and free from residual state that could skew results or degrade
+        system performance.
       docstring:
         examples:
         - lines:
-          - execute_test_teardown()
-          output: '{''cleanup_success'': True, ''removed_artifacts'': [''temp_data.csv'',
-            ''log_file.log''], ''error_messages'': []}'
+          - '# Assuming the test environment has been modified by previous steps'
+          - result = execute_test_teardown()
+          - assert result['cleanup_success'] is True
+          - assert len(result['error_messages']) == 0
+          output: Test environment cleaned successfully, no errors.
         parameters: []
         raises:
-        - description: If an error occurs during the cleanup process.
-          type: Exception
+        - description: If critical cleanup steps fail and the environment cannot be
+            safely restored.
+          type: RuntimeError
         returns:
-          description: A dictionary containing the cleanup success status, list of
-            removed artifacts, and any error messages encountered.
+          description: A dictionary containing cleanup_success (bool), removed_artifacts
+            (List[str]), and error_messages (List[str]).
           type: dict
-        summary: Execute test environment teardown by removing test artifacts and
-          temporary configurations.
-    prompt: Restore the test environment to its original state by removing all test
-      artifacts, data, and temporary configurations.
+        summary: Restore the test environment to its original state after all test
+          scenarios have executed.
+    prompt: "After all test scenarios have run, meticulously restore the testing environment\
+      \ to its pristine pre‑test state.  \n\n1. Enumerate every temporary file, directory,\
+      \ database entry, environment variable, and network service that was introduced\
+      \ or altered during the test run.\n2. Safely delete or revert each artifact,\
+      \ ensuring no residual data remains that could bias subsequent executions.\n\
+      3. Verify that all system configurations, such as registry keys, kernel parameters,\
+      \ or container images, have been reset to their original defaults.\n4. Record\
+      \ the outcome of each cleanup action, capturing any failures or warnings.\n\
+      5. Return a structured summary of the teardown operation, including success\
+      \ status, list of removed items, and any error messages.\n\nThe goal is to guarantee\
+      \ isolation and repeatability for every test cycle, preventing cross‑contamination\
+      \ and ensuring that future runs start from a clean slate."
   generate_test_data:
     agent: false
-    description: Create required test input datasets
+    description: Synthesizes and validates comprehensive test data files for all test
+      cases, ensuring schema fidelity, volume compliance, and environmental readiness
+      before test execution.
     name: generate_test_data
     nodes_depended_on:
     - create_test_cases
@@ -307,57 +354,71 @@ nodes:
       key: is_valid
       type: bool
     prd:
-      conceptual_info: The generate_test_data node is responsible for producing all
-        data files that will be consumed by test cases. It synthesizes data that match
-        the structure, volume, and constraints defined in the test cases and the prepared
-        environment. The node ensures that each file has the correct schema, data
-        type fidelity, and that the overall dataset passes validation checks before
-        signaling readiness to the test setup phase.
+      conceptual_info: The generate_test_data node is the linchpin that bridges test
+        design and execution. It produces every data artifact that test cases will
+        consume, guaranteeing that each file adheres to the declared schema, respects
+        data distribution constraints, and is compatible with the pre‑configured testing
+        environment. By incorporating deterministic data generation and rigorous validation,
+        the node eliminates flaky tests and ensures reproducible outcomes across CI/CD
+        pipelines.
       docstring:
         examples:
         - lines:
-          - 'test_cases = ["Test case 1: 1000 CSV rows", "Test case 2: 500 JSON objects"],'
-          - 'environment_config = {"supported_formats": ["CSV", "JSON"]},'
+          - 'test_cases = [{''name'': ''users'', ''schema'': {''id'': ''int'', ''name'':
+            ''str''}, ''count'': 5000, ''format'': ''csv''}]'
+          - 'environment_config = {''storage_path'': ''/tmp/test_data'', ''supported_formats'':
+            [''csv'', ''json'']}'
           - result = generate_test_data(test_cases, environment_config)
-          output: "{\n  \"test_data_files\": [\"tc1_data.csv\", \"tc2_data.json\"\
-            ],\n  \"record_counts\": [1000, 500],\n  \"data_formats\": [\"CSV\", \"\
-            JSON\"],\n  \"is_valid\": true\n}"
-        - lines:
-          - 'test_cases = ["Test case 3: 2000 XML rows"],'
-          - 'environment_config = {"supported_formats": ["CSV", "JSON"]},'
-          - "try:\n  generate_test_data(test_cases, environment_config)\nexcept RuntimeError\
-            \ as e:\n  print(e)"
-          output: '"RuntimeError: Unsupported data format ''XML'' for test case 3"'
+          - print(result['is_valid'])
+          output: '[True]'
         parameters:
-        - description: List of test case descriptions produced by the create_test_cases
-            node. Each description may include data specifications such as field names,
-            types, ranges, and expected record counts.
+        - description: Output from the create_test_cases node; each dictionary contains
+            schema, volume, and constraint metadata.
           name: test_cases
-          type: List[str]
-        - description: Dictionary of environment settings output from the prepare_test_environment
-            node, such as supported file formats, database connection parameters,
-            and any constraints on data content.
+          type: List[Dict]
+        - description: Output from the prepare_test_environment node; includes supported
+            file formats, storage paths, and available resources.
           name: environment_config
-          type: Dict[str, Any]
+          type: Dict
         raises:
-        - description: Raised if any test case specification is malformed or missing
-            required fields.
+        - description: Raised when a test case's constraints cannot be satisfied given
+            the environment resources.
           type: ValueError
-        - description: Raised if data generation fails due to unsupported format,
-            insufficient resources, or validation errors.
+        - description: Raised if file I/O or schema validation fails.
           type: RuntimeError
         returns:
-          description: 'A dictionary matching the output_structure of the node: keys
-            "test_data_files", "record_counts", "data_formats", and "is_valid".'
-          type: Dict[str, Any]
-        summary: Generate synthetic or curated test data needed for all test cases,
-          ensuring compatibility with the prepared test environment and test case
-          requirements.
-    prompt: Generate synthetic or curated test data needed for all test cases, ensuring
-      compatibility with the prepared test environment and test case requirements.
+          description: 'A dictionary mapping to the four output fields: test_data_files,
+            record_counts, data_formats, and is_valid.'
+          type: Dict
+        summary: Generate and validate synthetic or curated test data files for all
+          defined test cases.
+    prompt: "You are a data synthesis specialist. Given the list of test cases produced\
+      \ by **create_test_cases** and the environment configuration from **prepare_test_environment**,\
+      \ generate all required test data files.\n\n**Requirements**:\n1. For each test\
+      \ case, identify the data schema, volume, and constraints (e.g., field ranges,\
+      \ uniqueness, foreign key relationships).\n2. Produce synthetic data that satisfies\
+      \ those constraints while mimicking realistic distributions (use Gaussian, Zipf,\
+      \ or domain‑specific patterns where appropriate).\n3. Store each data set in\
+      \ a separate file using the format specified by the test case (CSV, JSON, Parquet,\
+      \ etc.).\n4. Validate each file against the target schema, record any discrepancies,\
+      \ and ensure every file passes all validation checks.\n5. Generate a summary\
+      \ report listing:\n   - filename\n   - record count\n   - file format\n   -\
+      \ validity flag (true if schema and constraint checks pass, false otherwise)\n\
+      6. If any test case cannot be satisfied (e.g., conflicting constraints or missing\
+      \ environment resources), raise an informative exception.\n\n**Output** should\
+      \ be a JSON object with the following fields:\n- test_data_files (List[str])\n\
+      - record_counts (List[int])\n- data_formats (List[str])\n- is_valid (List[bool])\n\
+      \nThe node must run deterministically; use seeded random generators to allow\
+      \ reproducibility.\n\nExample: If the test case requires 10,000 customer records\
+      \ in CSV format, generate a file `customers_test.csv` with 10,000 rows, validate,\
+      \ and mark it as valid."
   generate_test_report:
     agent: false
-    description: Create formal test evaluation summary
+    description: Creates a formal, objective test evaluation summary by synthesizing
+      the high‑level metrics produced by the analyze_test_results step. The report
+      consolidates test scope, execution procedures, statistical outcomes, and the
+      final pass/fail verdict for consumption by stakeholders and downstream quality
+      gates.
     name: generate_test_report
     nodes_depended_on:
     - analyze_test_results
@@ -377,69 +438,74 @@ nodes:
       key: overall_status
       type: bool
     prd:
-      conceptual_info: The node synthesizes a formal, objective test report by consuming
-        the high‑level outcome metrics produced by the analysis step. It distills
-        the raw test statistics into human‑readable sections that describe what was
-        tested, how it was tested, the factual outcome, and the overall pass/fail
-        decision.
+      conceptual_info: The generate_test_report node distills quantitative test execution
+        data into a human‑readable, objective report. It leverages the aggregated
+        metrics from analyze_test_results to provide stakeholders with a clear snapshot
+        of what was tested, how it was tested, the factual outcome, and the ultimate
+        pass/fail decision, without embedding any remediation advice. This separation
+        of analysis and reporting ensures that downstream quality gates can consume
+        a deterministic pass/fail flag while executives receive a narrative that is
+        easy to interpret.
       docstring:
         examples:
         - lines:
-          - report = generate_test_report(
-          - '    summary=''All functional tests executed'','
-          - '    total_tests=15,'
-          - '    passed_tests=14,'
-          - '    failed_tests=1,'
-          - '    failed_test_ids=[''TC-07''],'
-          - '    overall_pass=False)'
-          - print(report['results_analysis'])
-          output: '"Detected 1 failed test(s) out of 15: TC-07. Overall status: Fail."'
-        - lines:
-          - report = generate_test_report(
-          - '    summary=''Security tests completed'','
-          - '    total_tests=8,'
-          - '    passed_tests=8,'
-          - '    failed_tests=0,'
-          - '    failed_test_ids=[],'
-          - '    overall_pass=True)'
-          - print(report['overall_status'])
-          output: 'True'
+          - analysis = {
+          - '    "summary": "All tests executed.",'
+          - '    "total_tests": 120,'
+          - '    "passed_tests": 118,'
+          - '    "failed_tests": 2,'
+          - '    "failed_test_ids": ["test_user_create_missing_field", "test_auth_token_expiry"],'
+          - '    "overall_pass": false'
+          - '} '
+          - report = generate_test_report(analysis)
+          output: "{\n  \"test_scope\": \"Functional regression of API v2 endpoints\
+            \ for the user management module\",\n  \"test_procedures\": [\"Unit test\
+            \ suite for user CRUD operations\", \"Load testing of authentication endpoint\"\
+            ],\n  \"results_analysis\": \"120 tests executed: 118 passed, 2 failed\
+            \ (missing field and token expiry). All failures were in edge‑case scenarios;\
+            \ no core functionality regressions detected.\",\n  \"overall_status\"\
+            : false\n}"
         parameters:
-        - description: Brief textual summary of the analysis highlighting overall
-            findings.
-          name: summary
-          type: str
-        - description: Total number of test cases evaluated.
-          name: total_tests
-          type: int
-        - description: Count of test cases that met expected outcomes.
-          name: passed_tests
-          type: int
-        - description: Count of test cases that did not meet expected outcomes.
-          name: failed_tests
-          type: int
-        - description: Identifiers or names of the test cases that failed.
-          name: failed_test_ids
-          type: List[str]
-        - description: Overall pass/fail status of the test run (true if all tests
-            passed).
-          name: overall_pass
-          type: bool
+        - description: Dictionary containing analysis metrics from the analyze_test_results
+            node.
+          name: analysis_result
+          type: dict
         raises:
-        - description: If any input is of an unexpected type or value.
+        - description: Raised if required keys are missing from analysis_result.
           type: ValueError
         returns:
-          description: 'A dictionary containing the formatted test report fields:
-            test_scope, test_procedures, results_analysis, overall_status.'
+          description: JSON object with keys test_scope, test_procedures, results_analysis,
+            overall_status.
           type: dict
-        summary: Generate a concise, objective test report from analysis results.
-    prompt: Produce a concise summary report showing test scope, procedures, results
-      analysis, and final status (pass/fail). Avoid subjective interpretations.
+        summary: Generate a formal test evaluation summary from analysis metrics.
+    prompt: "Using the JSON object returned from **analyze_test_results**, generate\
+      \ a concise, structured test report with the following fields:\n\n1. **test_scope**\
+      \ – A one‑sentence description of the overall test objectives (e.g., \"Functional\
+      \ regression of API v2 endpoints for the user management module\").\n2. **test_procedures**\
+      \ – A list of the high‑level test procedures that were executed (e.g., \"Unit\
+      \ test suite for user CRUD operations\", \"Load testing of authentication endpoint\"\
+      ).\n3. **results_analysis** – An objective textual analysis summarizing the\
+      \ test run: total tests, passed/failed counts, and any notable deviations (e.g.,\
+      \ significant failures in edge‑case scenarios). Avoid subjective language or\
+      \ recommendations.\n4. **overall_status** – A boolean indicating the overall\
+      \ pass/fail status (true = all tests passed, false = any failure).\n\nThe output\
+      \ must be a JSON object containing exactly these keys, each matching the type\
+      \ specified in the output structure. Do not include any additional keys or narrative\
+      \ outside the JSON.\n\nExample input (from analyze_test_results):\n```json\n\
+      {\n  \"summary\": \"All tests executed.\",\n  \"total_tests\": 120,\n  \"passed_tests\"\
+      : 118,\n  \"failed_tests\": 2,\n  \"failed_test_ids\": [\"test_user_create_missing_field\"\
+      , \"test_auth_token_expiry\"],\n  \"overall_pass\": false\n}\n```\n\nExample\
+      \ output:\n```json\n{\n  \"test_scope\": \"Functional regression of API v2 endpoints\
+      \ for the user management module\",\n  \"test_procedures\": [\"Unit test suite\
+      \ for user CRUD operations\", \"Load testing of authentication endpoint\"],\n\
+      \  \"results_analysis\": \"120 tests executed: 118 passed, 2 failed (missing\
+      \ field and token expiry). All failures were in edge‑case scenarios; no core\
+      \ functionality regressions detected.\",\n  \"overall_status\": false\n}\n```"
   identify_test_scope:
     agent: false
-    description: Outline the objectives and scope of the test by specifying clear
-      goals, defining what is in‑scope and out‑of‑scope, and establishing measurable
-      success criteria.
+    description: Defines the strategic framework for a test run by specifying explicit
+      goals, scope boundaries, measurable success criteria, and a concise summary
+      that guides test case creation and environment setup.
     name: identify_test_scope
     nodes_depended_on: []
     nodes_dependent_on: []
@@ -459,43 +525,57 @@ nodes:
       key: summary
       type: str
     prd:
-      conceptual_info: The identify_test_scope node defines the strategic framework
-        for a test run. It captures the intent, constraints, and acceptance metrics
-        that guide downstream test case creation and environment configuration.
+      conceptual_info: The identify_test_scope node establishes the strategic vision
+        for a test cycle. It captures the intent, constraints, and acceptance metrics
+        that direct subsequent test design, environment provisioning, and execution
+        planning.
       docstring:
         examples:
         - lines:
-          - scope = identify_test_scope("Verify authentication flows for the admin
-            portal.")
+          - 'scope = identify_test_scope(context={''business_goal'': ''reduce API
+            latency''})'
           - print(scope['summary'])
-          output: '"Verification of admin authentication mechanisms, including login,
-            logout, and session handling."'
-        - lines:
-          - scope = identify_test_scope("Test performance of the search API under
-            load.")
-          - print(scope['goals'])
-          output: '["Measure query latency", "Validate throughput", "Ensure error
-            rate < 0.1%"]'
+          output: The test focuses on API latency reduction, targeting a 20% improvement
+            over the current baseline.
         parameters:
-        - description: Free‑form textual description of the testing intent or high‑level
-            requirement.
-          name: input_text
-          type: str
+        - description: Optional contextual information such as business goals, regulatory
+            mandates, or prior test results that influence scope definition.
+          name: context
+          type: dict
         raises:
-        - description: If input_text is empty or not a string.
+        - description: Raised if required contextual information is missing or insufficient
+            to define a coherent scope.
           type: ValueError
         returns:
-          description: 'A dictionary containing four keys: ''goals'' (list of strings),
-            ''boundaries'' (list of strings), ''success_criteria'' (list of strings),
-            and ''summary'' (string).'
-          type: Dict[str, Any]
-        summary: Define the objectives, boundaries, and success criteria for a software
-          test.
-    prompt: Define the specific goals, boundaries, and success criteria for the test.
-      Focus solely on test scope definition.
+          description: A dictionary with keys 'goals', 'boundaries', 'success_criteria',
+            and 'summary', each containing the respective scoped content.
+          type: dict
+        summary: Generate a structured definition of test objectives, boundaries,
+          and success criteria.
+    prompt: "You are tasked with defining a rigorous test scope for the upcoming test\
+      \ cycle. Deliver a clear, structured definition that includes:\n1. A concise\
+      \ list of **specific test goals** that align with business objectives and regulatory\
+      \ requirements.\n2. A **boundaries** section that explicitly lists what is **in‑scope**\
+      \ and what is **out‑of‑scope**, including constraints such as data volume limits,\
+      \ platform versions, and third‑party integration boundaries.\n3. A set of **measurable\
+      \ success criteria** expressed as quantitative or qualitative thresholds (e.g.,\
+      \ defect density < 0.5%, performance latency < 200 ms, compliance pass rate\
+      \ ≥ 99%).\n4. A one‑paragraph **summary** that captures the overall intent,\
+      \ critical constraints, and expected impact of the defined scope.\n\nThe output\
+      \ must be a JSON object with the following keys: \"goals\", \"boundaries\",\
+      \ \"success_criteria\", and \"summary\". Each key should map to a list or string\
+      \ as specified in the output structure.\n\nExample output format:\n{\n  \"goals\"\
+      : [\"Ensure all new API endpoints meet latency targets\"],\n  \"boundaries\"\
+      : [\"In‑scope: v1.3 APIs; Out‑of‑scope: legacy v1.1 APIs\"],\n  \"success_criteria\"\
+      : [\"Latency < 200 ms for 95% of requests\"],\n  \"summary\": \"Test focuses\
+      \ on v1.3 API performance and reliability, excluding legacy components.\"\n\
+      }\n\nAdhere strictly to the output format; no additional keys or text should\
+      \ be present."
   prepare_test_environment:
     agent: false
-    description: Configure testing infrastructure and dependencies
+    description: Automates the provisioning, configuration, and validation of the
+      entire testing infrastructure—hardware, software, network, and isolation layers—ensuring
+      a repeatable, compliant environment that satisfies the test scope constraints.
     name: prepare_test_environment
     nodes_depended_on:
     - identify_test_scope
@@ -523,83 +603,80 @@ nodes:
       key: environment_summary
       type: str
     prd:
-      conceptual_info: This node is responsible for provisioning the hardware, installing
-        required software, configuring network and system settings, and validating
-        the setup before any test data is generated or test cases are executed.
+      conceptual_info: This node is the gatekeeper that guarantees a consistent, reliable,
+        and compliant test environment before any test data or cases are introduced.
+        It abstracts the complexities of infrastructure provisioning into a single,
+        repeatable step, thereby reducing manual errors, speeding up test cycles,
+        and enabling continuous integration pipelines to run smoothly.
       docstring:
         examples:
         - lines:
-          - 'env = prepare_test_environment(
-
-            '
-          - '    scope_goals=["Verify API throughput"],
-
-            '
-          - '    scope_boundaries=["No external network"],
-
-            '
-          - '    scope_success_criteria=["All services respond within 200ms"]
-
-            '
-          - )
-          output: "{\n  \"setup_steps\": [\"install docker\", \"configure network\"\
-            , \"start services\"],\n  \"installed_software\": [\"Docker 20.10\", \"\
-            Python 3.11\"],\n  \"hardware_configuration\": [\"8 CPU cores\", \"16GB\
-            \ RAM\"],\n  \"validation_results\": [true, true, true],\n  \"validation_steps\"\
-            : [\"check docker running\", \"ping localhost\", \"service health check\"\
-            ],\n  \"environment_summary\": \"Environment ready: all services operational\
-            \ and meeting latency targets.\"\n}"
-        - lines:
-          - 'env = prepare_test_environment(
-
-            '
-          - '    scope_goals=["Load‑test database"],
-
-            '
-          - '    scope_boundaries=["No external network", "GPU not available"],
-
-            '
-          - '    scope_success_criteria=["Database replicas reachable"]
-
-            '
-          - )
-          output: "{\n  \"setup_steps\": [\"install postgres\", \"configure replication\"\
-            ],\n  \"installed_software\": [\"PostgreSQL 15\"],\n  \"hardware_configuration\"\
-            : [\"4 CPU cores\", \"8GB RAM\"],\n  \"validation_results\": [true, true],\n\
-            \  \"validation_steps\": [\"check postgres service\", \"replication health\"\
-            ],\n  \"environment_summary\": \"Environment ready: PostgreSQL cluster\
-            \ operational.\"\n}"
+          - from workflow.nodes.prepare_test_environment import prepare_test_environment
+          - '# Assume ''scope'' dict obtained from identify_test_scope node'
+          - result = prepare_test_environment(scope)
+          - print(result['environment_summary'])
+          output: '"Environment ready: 8 vCPUs, 32GB RAM, PostgreSQL 13.4, all validations
+            passed."'
         parameters:
-        - description: List of high‑level objectives derived from identify_test_scope
-            that influence which components must be installed or configured.
-          name: scope_goals
-          type: List[str]
-        - description: List of constraints that limit the environment (e.g., no external
-            network access, limited RAM).
-          name: scope_boundaries
-          type: List[str]
-        - description: Success conditions that must be met for the environment to
-            be considered ready.
-          name: scope_success_criteria
-          type: List[str]
+        - description: Dictionary containing test objectives, required resources,
+            and success criteria as produced by the 'identify_test_scope' node.
+          name: scope
+          type: dict
         raises:
-        - description: Raised if any critical validation step fails, indicating that
-            the environment is not ready for testing.
-          type: RuntimeError
-        - description: Raised when input lists are empty or contain invalid entries.
-          type: ValueError
+        - description: Raised if hardware allocation fails or required quota is exceeded.
+          type: EnvironmentProvisionError
+        - description: Raised when a critical dependency cannot be installed or verified.
+          type: SoftwareInstallationError
+        - description: Raised when any validation step reports a failure.
+          type: ValidationFailedError
         returns:
-          description: Dictionary containing the ordered setup actions, installed
-            software list, hardware configuration details, validation results, validation
-            steps, and a concise environment summary.
-          type: Dict[str, Union[List[str], List[bool], str]]
-        summary: Prepares the test environment by installing software, allocating
-          hardware resources, configuring settings, and validating the setup.
-    prompt: Set up the testing environment (software, hardware, configurations) required
-      to execute the test as defined in the scope. Document any validation steps.
+          description: Structured JSON with setup steps, installed software, hardware
+            configuration, validation results, and a summary.
+          type: dict
+        summary: Provision, configure, and validate the testing environment based
+          on a predefined test scope.
+    prompt: 'Using the test scope defined in the previous node, orchestrate a fully
+      automated, reproducible test environment.
+
+      1. **Hardware provisioning** – Allocate the exact compute, storage, and networking
+      resources required (e.g., VM types, GPU count, high‑speed SSDs, network bandwidth).
+      Capture resource identifiers.
+
+      2. **Software stack installation** – Install the precise versions of operating
+      system packages, runtime environments, databases, message queues, and any vendor‑specific
+      tools. Record each component’s name and version.
+
+      3. **Configuration** – Apply system‑level settings (kernel parameters, security
+      policies), application configuration files, and network routing rules. Validate
+      that configuration changes are idempotent.
+
+      4. **Environment isolation** – Set up container orchestration (Docker/Kubernetes)
+      or virtualized sandboxes to ensure repeatability across runs.
+
+      5. **Validation suite** – Execute a predefined set of health‑check scripts (e.g.,
+      `healthcheck.sh`, `db_connectivity_test.py`) and record pass/fail outcomes.
+
+      6. **Documentation** – Generate a concise summary that lists all provisioning
+      steps, installed components, and validation results.
+
+      Return a JSON payload containing the following keys:
+
+      - setup_steps
+
+      - installed_software
+
+      - hardware_configuration
+
+      - validation_steps
+
+      - validation_results
+
+      - environment_summary'
   run_test_scenarios:
     agent: false
-    description: Execute all defined test cases
+    description: Orchestrates the systematic execution of every test case in the suite,
+      capturing raw logs, pass/fail status, and performance metrics in a deterministic,
+      reproducible manner.
     name: run_test_scenarios
     nodes_depended_on:
     - execute_test_setup
@@ -619,53 +696,65 @@ nodes:
       key: execution_times_seconds
       type: List[float]
     prd:
-      conceptual_info: The run_test_scenarios node is responsible for orchestrating
-        the execution of every test case defined in the test suite. It leverages the
-        environment prepared by execute_test_setup, runs each test case sequentially,
-        captures the raw logs, determines pass/fail status based on exit codes or
-        assertions, and records the execution time for performance analysis.
+      conceptual_info: The run_test_scenarios node acts as the execution engine for
+        the test suite. It consumes the fully prepared test environment from execute_test_setup,
+        iteratively runs each test case, and aggregates low‑level execution artifacts.
+        These artifacts are later used by reporting and analytics nodes to generate
+        summaries, detect regressions, and measure performance trends.
       docstring:
         examples:
         - lines:
-          - result = run_test_scenarios(
-          - '    environment_id=''env_123'','
-          - '    test_cases=[''tc1.sh'', ''tc2.sh''],'
-          - '    setup_steps=[''install deps'', ''configure network'']'
-          - )
-          - print(result['execution_status'])
+          - results = run_test_scenarios(environment_id='env_123', test_cases=[{'id':'tc01','cmd':'pytest
+            -k tc01'}, {'id':'tc02','cmd':'pytest -k tc02'}])
+          - print(results['execution_status'])
           output: '[True, False]'
-        - lines:
-          - result = run_test_scenarios(
-          - '    environment_id=''env_456'','
-          - '    test_cases=[''tc3.py''],'
-          - '    setup_steps=[''setup env'']'
-          - )
-          - print(result['execution_times_seconds'])
-          output: '[2.34]'
         parameters:
-        - description: Unique identifier of the prepared test execution environment
-            returned by execute_test_setup.
+        - description: Identifier of the test environment prepared by execute_test_setup.
           name: environment_id
           type: str
-        - description: A list of test case identifiers or script paths to be executed.
+        - description: A list of test case definitions, each containing an 'id' and
+            execution command or reference.
           name: test_cases
-          type: List[str]
-        - description: Ordered list of configuration actions performed during setup,
-            used for contextual logging.
-          name: setup_steps
-          type: List[str]
+          type: List[dict]
         raises:
-        - description: If the environment is not ready or a critical setup step failed.
+        - description: Raised if the environment_id is invalid or the test environment
+            is not ready.
           type: RuntimeError
-        - description: If a specified test case file is missing.
-          type: FileNotFoundError
-        - description: For any unexpected errors during test execution.
-          type: Exception
+        - description: Raised when a test case exceeds its allocated timeout threshold.
+          type: TimeoutError
         returns:
-          description: 'A dictionary containing four keys: ''test_case_ids'', ''execution_status'',
-            ''execution_logs'', and ''execution_times_seconds'', each a list aligned
-            by test case order.'
-          type: Dict[str, List[Any]]
-        summary: Run all test cases and return raw execution data.
-    prompt: Systematically execute all test cases using the prepared environment,
-      test setup, and generated data. Record raw execution results without interpretation.
+          description: A dictionary containing lists of test_case_ids, execution_status,
+            execution_logs, and execution_times_seconds.
+          type: dict
+        summary: Execute all test cases and return raw execution data.
+    prompt: 'Execute all test cases defined in the current test suite within the environment
+      prepared by the preceding node. For each test case:
+
+      1. Run the test harness (CLI or API call) using the environment ID and loaded
+      test data.
+
+      2. Capture the raw log output and any stdout/stderr streams.
+
+      3. Record the exit code; treat non‑zero exit codes or assertion failures as
+      a failure.
+
+      4. Measure the elapsed wall‑clock time from start to finish.
+
+      5. Append the results to the cumulative output list.
+
+      After processing all test cases, return the aggregated data structure.
+
+
+      The prompt should enforce the following constraints:
+
+      - No intermediate interpretation or summarization of logs – raw logs only.
+
+      - Use precise, deterministic timestamps (ISO 8601 UTC) for start and end times.
+
+      - Ensure the node is deterministic: identical inputs must always produce the
+      same outputs.
+
+      - Handle timeouts gracefully by marking the test case as failed and logging
+      a timeout message.
+
+      - Provide clear, machine‑readable JSON for downstream consumption.'

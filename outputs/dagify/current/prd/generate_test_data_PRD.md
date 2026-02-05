@@ -1,52 +1,38 @@
 # generate_test_data PRD
 
 ## Description
-Create required test input datasets
+Synthesizes and validates comprehensive test data files for all test cases, ensuring schema fidelity, volume compliance, and environmental readiness before test execution.
 
 
 ## Conceptual Info
 
-The generate_test_data node is responsible for producing all data files that will be consumed by test cases. It synthesizes data that match the structure, volume, and constraints defined in the test cases and the prepared environment. The node ensures that each file has the correct schema, data type fidelity, and that the overall dataset passes validation checks before signaling readiness to the test setup phase.
+The generate_test_data node is the linchpin that bridges test design and execution. It produces every data artifact that test cases will consume, guaranteeing that each file adheres to the declared schema, respects data distribution constraints, and is compatible with the pre‑configured testing environment. By incorporating deterministic data generation and rigorous validation, the node eliminates flaky tests and ensures reproducible outcomes across CI/CD pipelines.
 
 ## Docstring
 
 ### Summary
-Generate synthetic or curated test data needed for all test cases, ensuring compatibility with the prepared test environment and test case requirements.
+Generate and validate synthetic or curated test data files for all defined test cases.
 
 ### Parameters
 
-- **test_cases** (List[str]): List of test case descriptions produced by the create_test_cases node. Each description may include data specifications such as field names, types, ranges, and expected record counts.
-- **environment_config** (Dict[str, Any]): Dictionary of environment settings output from the prepare_test_environment node, such as supported file formats, database connection parameters, and any constraints on data content.
+- **test_cases** (List[Dict]): Output from the create_test_cases node; each dictionary contains schema, volume, and constraint metadata.
+- **environment_config** (Dict): Output from the prepare_test_environment node; includes supported file formats, storage paths, and available resources.
 
 ### Returns
 
-Dict[str, Any]: A dictionary matching the output_structure of the node: keys "test_data_files", "record_counts", "data_formats", and "is_valid".
+Dict: A dictionary mapping to the four output fields: test_data_files, record_counts, data_formats, and is_valid.
 
 ### Raises
 
-- ValueError: Raised if any test case specification is malformed or missing required fields.
-- RuntimeError: Raised if data generation fails due to unsupported format, insufficient resources, or validation errors.
+- ValueError: Raised when a test case's constraints cannot be satisfied given the environment resources.
+- RuntimeError: Raised if file I/O or schema validation fails.
 
 ### Examples
 
 ```python
->>> test_cases = ["Test case 1: 1000 CSV rows", "Test case 2: 500 JSON objects"],
->>> environment_config = {"supported_formats": ["CSV", "JSON"]},
+>>> test_cases = [{'name': 'users', 'schema': {'id': 'int', 'name': 'str'}, 'count': 5000, 'format': 'csv'}]
+>>> environment_config = {'storage_path': '/tmp/test_data', 'supported_formats': ['csv', 'json']}
 >>> result = generate_test_data(test_cases, environment_config)
-{
-  "test_data_files": ["tc1_data.csv", "tc2_data.json"],
-  "record_counts": [1000, 500],
-  "data_formats": ["CSV", "JSON"],
-  "is_valid": true
-}
-```
-
-```python
->>> test_cases = ["Test case 3: 2000 XML rows"],
->>> environment_config = {"supported_formats": ["CSV", "JSON"]},
->>> try:
-  generate_test_data(test_cases, environment_config)
-except RuntimeError as e:
-  print(e)
-"RuntimeError: Unsupported data format 'XML' for test case 3"
+>>> print(result['is_valid'])
+[True]
 ```
