@@ -1,6 +1,5 @@
-dag_type: plain_text
-description: A highly granular and concurrent workflow for systematically designing,
-  executing, and evaluating a test process.
+dag_type: typed
+description: Generated workflow from UI.
 name: execute_test_workflow
 nodes:
   analyze_test_results:
@@ -10,6 +9,25 @@ nodes:
     nodes_depended_on:
     - collect_test_results
     nodes_dependent_on: []
+    output_structure:
+    - description: Brief textual summary of the analysis highlighting overall findings.
+      key: summary
+      type: str
+    - description: Total number of test cases evaluated.
+      key: total_tests
+      type: int
+    - description: Count of test cases that met expected outcomes.
+      key: passed_tests
+      type: int
+    - description: Count of test cases that did not meet expected outcomes.
+      key: failed_tests
+      type: int
+    - description: Identifiers or names of the test cases that failed.
+      key: failed_test_ids
+      type: List[str]
+    - description: Overall pass/fail status of the test run (true if all tests passed).
+      key: overall_pass
+      type: bool
     prompt: Compare actual test results with expected outcomes, identify deviations,
       and classify them as pass/fail. Provide objective analysis without recommendations.
   collect_test_results:
@@ -19,6 +37,20 @@ nodes:
     nodes_depended_on:
     - execute_test_teardown
     nodes_dependent_on: []
+    output_structure:
+    - description: List of raw execution log entries captured during the test run
+      key: execution_logs
+      type: List[str]
+    - description: List of error messages or exception traces generated during execution
+      key: error_messages
+      type: List[str]
+    - description: Numeric performance measurements (e.g., response times, memory
+        usage) recorded for the test run
+      key: performance_metrics
+      type: List[float]
+    - description: Brief textual summary of the collected logs and errors
+      key: log_summary
+      type: str
     prompt: Extract, organize, and document all test execution output logs, error
       messages, and performance metrics from the test run.
   create_test_cases:
@@ -28,16 +60,41 @@ nodes:
     nodes_depended_on:
     - identify_test_scope
     nodes_dependent_on: []
+    output_structure:
+    - description: List of test case descriptions, each containing steps, input data
+        requirements, and expected outcomes, formatted as numbered items.
+      key: test_cases
+      type: List[str]
+    - description: The total number of test cases generated.
+      key: total_cases
+      type: int
     prompt: Write specific test case steps, input data requirements, and expected
       outcomes aligned with the defined test scope. List test cases as numbered items
       with clear instructions.
   execute_test_setup:
     agent: false
-    description: Initialize test execution environment
+    description: Initialize test execution environment by performing all required
+      pre-test configuration steps, loading test data, and initializing test states.
     name: execute_test_setup
     nodes_depended_on:
     - generate_test_data
     nodes_dependent_on: []
+    output_structure:
+    - description: Unique identifier of the prepared test execution environment.
+      key: environment_id
+      type: str
+    - description: Ordered list of configuration actions performed during setup (e.g.,
+        "install dependencies", "configure network", "initialize services").
+      key: setup_steps
+      type: List[str]
+    - description: Identifiers or file names of test data assets that were loaded
+        into the environment.
+      key: loaded_test_data
+      type: List[str]
+    - description: Flag indicating whether the environment is fully configured and
+        ready for test execution.
+      key: environment_ready
+      type: bool
     prompt: Perform all required pre-test configuration steps in the testing environment,
       including loading test data and initializing test states.
   execute_test_teardown:
@@ -47,6 +104,18 @@ nodes:
     nodes_depended_on:
     - run_test_scenarios
     nodes_dependent_on: []
+    output_structure:
+    - description: Indicates whether the environment cleanup completed without errors.
+      key: cleanup_success
+      type: bool
+    - description: List of filenames, directories, or resources that were deleted
+        during teardown.
+      key: removed_artifacts
+      type: List[str]
+    - description: Any error messages encountered while attempting to remove artifacts
+        or reset configurations.
+      key: error_messages
+      type: List[str]
     prompt: Restore the test environment to its original state by removing all test
       artifacts, data, and temporary configurations.
   generate_test_data:
@@ -57,6 +126,21 @@ nodes:
     - create_test_cases
     - prepare_test_environment
     nodes_dependent_on: []
+    output_structure:
+    - description: List of filenames or identifiers for the generated test data sets.
+      key: test_data_files
+      type: List[str]
+    - description: Corresponding number of records in each generated test data file.
+      key: record_counts
+      type: List[int]
+    - description: File format or schema type for each generated test data file (e.g.,
+        CSV, JSON).
+      key: data_formats
+      type: List[str]
+    - description: Indicates whether all generated data meet the required specifications
+        and are ready for use.
+      key: is_valid
+      type: bool
     prompt: Generate synthetic or curated test data needed for all test cases, ensuring
       compatibility with the prepared test environment and test case requirements.
   generate_test_report:
@@ -66,6 +150,20 @@ nodes:
     nodes_depended_on:
     - analyze_test_results
     nodes_dependent_on: []
+    output_structure:
+    - description: Brief description of the test scope and objectives
+      key: test_scope
+      type: str
+    - description: List of high‑level test procedures or steps that were executed
+      key: test_procedures
+      type: List[str]
+    - description: Objective analysis of the test results, highlighting any deviations
+      key: results_analysis
+      type: str
+    - description: Final pass/fail status of the test suite (true = pass, false =
+        fail)
+      key: overall_status
+      type: bool
     prompt: Produce a concise summary report showing test scope, procedures, results
       analysis, and final status (pass/fail). Avoid subjective interpretations.
   identify_test_scope:
@@ -74,6 +172,21 @@ nodes:
     name: identify_test_scope
     nodes_depended_on: []
     nodes_dependent_on: []
+    output_structure:
+    - description: List of specific test goals to be achieved
+      key: goals
+      type: List[str]
+    - description: List of limits and constraints defining what is in‑scope and out‑of‑scope
+        for the test
+      key: boundaries
+      type: List[str]
+    - description: List of measurable criteria that determine when the test is considered
+        successful
+      key: success_criteria
+      type: List[str]
+    - description: Brief textual summary of the overall test scope
+      key: summary
+      type: str
     prompt: Define the specific goals, boundaries, and success criteria for the test.
       Focus solely on test scope definition.
   prepare_test_environment:
@@ -83,6 +196,28 @@ nodes:
     nodes_depended_on:
     - identify_test_scope
     nodes_dependent_on: []
+    output_structure:
+    - description: Ordered list of actions performed to configure the testing environment
+      key: setup_steps
+      type: List[str]
+    - description: Names and versions of software components installed in the environment
+      key: installed_software
+      type: List[str]
+    - description: Details of hardware resources allocated or configured for testing
+      key: hardware_configuration
+      type: List[str]
+    - description: Outcome of each validation step (true if successful, false otherwise)
+        in the same order as validation_steps
+      key: validation_results
+      type: List[bool]
+    - description: Descriptions of the validation checks performed to verify the environment
+        setup
+      key: validation_steps
+      type: List[str]
+    - description: Concise summary of the prepared testing environment and its readiness
+        status
+      key: environment_summary
+      type: str
     prompt: Set up the testing environment (software, hardware, configurations) required
       to execute the test as defined in the scope. Document any validation steps.
   run_test_scenarios:
@@ -92,5 +227,19 @@ nodes:
     nodes_depended_on:
     - execute_test_setup
     nodes_dependent_on: []
+    output_structure:
+    - description: Identifiers of the test cases that were executed
+      key: test_case_ids
+      type: List[str]
+    - description: Pass/fail status for each test case; true indicates pass, false
+        indicates fail
+      key: execution_status
+      type: List[bool]
+    - description: Raw log output captured for each test case execution
+      key: execution_logs
+      type: List[str]
+    - description: Duration of each test case execution in seconds
+      key: execution_times_seconds
+      type: List[float]
     prompt: Systematically execute all test cases using the prepared environment,
       test setup, and generated data. Record raw execution results without interpretation.
