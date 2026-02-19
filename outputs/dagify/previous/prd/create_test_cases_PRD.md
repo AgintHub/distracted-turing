@@ -1,40 +1,36 @@
 # create_test_cases PRD
 
 ## Description
-Generates a complete, structured list of test cases derived from the defined test scope, ensuring coverage of all objectives, constraints, and success criteria.
+Generates a comprehensive, structured list of baseball-themed test cases derived from the defined test scope, ensuring coverage of all objectives, constraints, and success criteria. These test cases are designed to simulate real-world baseball scenarios, allowing for thorough testing of the system's functionality and performance.
 
 
 ## Conceptual Info
 
-This node translates high‑level test goals and constraints into actionable, traceable test cases that can be directly executed by QA teams or automated frameworks. It ensures that every requirement is validated, reduces ambiguity, and provides a clear audit trail from scope to execution.
+This node translates high-level test goals and constraints into actionable, traceable baseball-themed test cases that can be directly executed by QA teams or automated frameworks. It ensures that every requirement is validated, reduces ambiguity, and provides a clear audit trail from scope to execution.
 
 ## Docstring
 
 ### Summary
-Create detailed test case descriptions from a test scope definition.
+Generate a list of baseball-themed test cases based on the provided test scope definition.
 
 ### Parameters
 
-- **scope_json** (dict): Dictionary containing 'goals', 'boundaries', 'success_criteria', and 'summary' keys as produced by identify_test_scope.
+- **test_scope** (dict): A dictionary containing the test scope definition, including goals, boundaries, success criteria, and summary.
 
 ### Returns
 
-tuple[List[str], int]: A tuple containing the list of test case descriptions and the total count.
-
-### Raises
-
-- ValueError: Raised when required keys are missing or malformed in the input scope.
+dict: A dictionary containing the list of baseball-themed test cases and the total number of test cases generated.
 
 ### Examples
 
 ```python
->>> scope = {
-...     "goals": ["Verify login", "Ensure data persistence"],
-...     "boundaries": ["Maximum input length", "Null value handling"],
-...     "success_criteria": ["Login succeeds in 2s", "Data remains after restart"],
-...     "summary": "Login and persistence test scope."
+>>> test_scope = {
+...     'goals': ['Test pitching functionality'],
+...     'boundaries': ['In-scope: pitching; Out-of-scope: batting'],
+...     'success_criteria': ['Pitching functionality works as expected'],
+...     'summary': 'Test pitching functionality.'
 >>> }
->>> test_cases, count = create_test_cases(scope)
-['Test 1: Valid login within 2s using standard credentials.', 'Test 2: Verify data persistence after application restart.']
-2
+>>> test_cases = create_test_cases(test_scope)
+>>> print(test_cases)
+{'test_cases': ['Test case 1: Pitching functionality', 'Test case 2: Pitching functionality with errors'], 'total_cases': 2}
 ```

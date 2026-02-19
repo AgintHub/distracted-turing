@@ -1,38 +1,36 @@
 # generate_test_data PRD
 
 ## Description
-Synthesizes and validates comprehensive test data files for all test cases, ensuring schema fidelity, volume compliance, and environmental readiness before test execution.
+Synthesizes, validates, and delivers comprehensive, schema-compliant test data files for all test cases, ensuring fidelity, volume compliance, and environmental readiness before test execution, leveraging seeded random generators for deterministic and reproducible results.
 
 
 ## Conceptual Info
 
-The generate_test_data node is the linchpin that bridges test design and execution. It produces every data artifact that test cases will consume, guaranteeing that each file adheres to the declared schema, respects data distribution constraints, and is compatible with the pre‑configured testing environment. By incorporating deterministic data generation and rigorous validation, the node eliminates flaky tests and ensures reproducible outcomes across CI/CD pipelines.
+The generate_test_data node acts as the linchpin that bridges test design and execution by producing every data artifact that test cases will consume, ensuring each file adheres to the declared schema, respects data distribution constraints, and is compatible with the pre-configured testing environment.
 
 ## Docstring
 
 ### Summary
-Generate and validate synthetic or curated test data files for all defined test cases.
+Generates and validates synthetic or curated test data files for all defined test cases, ensuring schema fidelity, volume compliance, and environmental readiness.
 
 ### Parameters
 
-- **test_cases** (List[Dict]): Output from the create_test_cases node; each dictionary contains schema, volume, and constraint metadata.
-- **environment_config** (Dict): Output from the prepare_test_environment node; includes supported file formats, storage paths, and available resources.
+- **test_cases** (List[str]): List of test case descriptions, each containing steps, input data requirements, and expected outcomes.
+- **environment_config** (dict): Environment configuration details, including setup steps, installed software, hardware configuration, validation steps, and validation results.
 
 ### Returns
 
-Dict: A dictionary mapping to the four output fields: test_data_files, record_counts, data_formats, and is_valid.
+dict: A dictionary containing the generated test data files, record counts, data formats, and validity flags.
 
 ### Raises
 
-- ValueError: Raised when a test case's constraints cannot be satisfied given the environment resources.
-- RuntimeError: Raised if file I/O or schema validation fails.
+- Exception: If any test case cannot be satisfied due to conflicting constraints or missing environment resources, an informative exception is raised.
 
 ### Examples
 
 ```python
->>> test_cases = [{'name': 'users', 'schema': {'id': 'int', 'name': 'str'}, 'count': 5000, 'format': 'csv'}]
->>> environment_config = {'storage_path': '/tmp/test_data', 'supported_formats': ['csv', 'json']}
->>> result = generate_test_data(test_cases, environment_config)
->>> print(result['is_valid'])
-[True]
+>>> test_cases = ['test_case_1', 'test_case_2']
+>>> environment_config = {'setup_steps': ['step1', 'step2'], 'installed_software': ['software1', 'software2']}
+>>> generate_test_data(test_cases, environment_config)
+{'test_data_files': ['test_data_file1.csv', 'test_data_file2.json'], 'record_counts': [1000, 500], 'data_formats': ['CSV', 'JSON'], 'is_valid': [True, True]}
 ```

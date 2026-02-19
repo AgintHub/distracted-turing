@@ -1,34 +1,33 @@
 # identify_test_scope PRD
 
 ## Description
-Defines the strategic framework for a test run by specifying explicit goals, scope boundaries, measurable success criteria, and a concise summary that guides test case creation and environment setup.
+Defines the strategic framework for a test run by specifying explicit goals, scope boundaries, measurable success criteria, and a concise summary that guides test case creation, environment setup, and execution planning, ensuring alignment with business objectives, regulatory requirements, and product roadmap milestones.
 
 
 ## Conceptual Info
 
-The identify_test_scope node establishes the strategic vision for a test cycle. It captures the intent, constraints, and acceptance metrics that direct subsequent test design, environment provisioning, and execution planning.
+The identify_test_scope node establishes the strategic vision for a test cycle, capturing the intent, constraints, and acceptance metrics that direct subsequent test design, environment provisioning, and execution planning. This node ensures alignment with business objectives, regulatory requirements, and product roadmap milestones.
 
 ## Docstring
 
 ### Summary
-Generate a structured definition of test objectives, boundaries, and success criteria.
+Defines the test scope, including goals, boundaries, success criteria, and summary, to guide test case creation and environment setup.
 
 ### Parameters
 
-- **context** (dict): Optional contextual information such as business goals, regulatory mandates, or prior test results that influence scope definition.
+- **test_cycle_input** (str): Input string containing test cycle information, such as product version, platform, and regulatory requirements
 
 ### Returns
 
-dict: A dictionary with keys 'goals', 'boundaries', 'success_criteria', and 'summary', each containing the respective scoped content.
+dict: A JSON object containing the defined test scope, including goals, boundaries, success criteria, and summary
 
 ### Raises
 
-- ValueError: Raised if required contextual information is missing or insufficient to define a coherent scope.
+- ValueError: Raised when the input string is empty or invalid
 
 ### Examples
 
 ```python
->>> scope = identify_test_scope(context={'business_goal': 'reduce API latency'})
->>> print(scope['summary'])
-The test focuses on API latency reduction, targeting a 20% improvement over the current baseline.
+>>> test_scope = identify_test_scope(test_cycle_input='Product X, Platform Y, Regulatory Z')
+{"goals": ["Ensure all new API endpoints meet latency targets"], "boundaries": ["In-scope: v1.3 APIs; Out-of-scope: legacy v1.1 APIs"], "success_criteria": ["Latency < 200 ms for 95% of requests"], "summary": "Test focuses on v1.3 API performance and reliability, excluding legacy components."}
 ```
